@@ -3,7 +3,7 @@ module github.com/JSYoo5B/SandStack
 go 1.25.0
 
 require (
-	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/chi/v5 v5.2.4
 	github.com/gophercloud/gophercloud/v2 v2.12.0
 	github.com/stretchr/testify v1.11.1
 )
