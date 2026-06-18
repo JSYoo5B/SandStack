@@ -1,0 +1,61 @@
+name: Go Commit Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  go-commit-checks:
+    name: Go tests per commit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify Go changes per commit
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          commits="$(git rev-list --reverse HEAD)"
+
+          if [[ -z "$commits" ]]; then
+            echo "No commits to verify."
+            exit 0
+          fi
+
+          for commit in $commits; do
+            short_commit="$(git rev-parse --short "$commit")"
+            subject="$(git log -1 --format=%s "$commit")"
+            files="$(git diff-tree --no-commit-id --name-only -r "$commit")"
+
+            if ! grep -Eq '(^go\.mod$|^go\.sum$|\.go$)' <<<"$files"; then
+              echo "Skipping $short_commit: $subject"
+              echo "No Go-relevant changes."
+              continue
+            fi
+
+            echo "::group::Verifying $short_commit: $subject"
+            git checkout --quiet "$commit"
+            if ! go test ./...; then
+              echo "::endgroup::"
+              echo "::error title=Go tests failed::$short_commit $subject"
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
