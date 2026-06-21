@@ -49,8 +49,9 @@ func (s *VersionSuite) TestVersion() {
 }
 
 func (s *VersionSuite) TestDiscovery() {
+	handler := identity.NewHandler(testhelper.DefaultConfig())
 	server := httptest.NewServer(
-		identity.Discovery(testhelper.DefaultConfig()),
+		handler.Discovery(),
 	)
 	defer server.Close()
 

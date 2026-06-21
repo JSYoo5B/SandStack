@@ -14,18 +14,8 @@ type Handler struct {
 	config  config.Config
 }
 
-func Discovery(cfg config.Config) http.HandlerFunc {
-	return NewHandler(cfg).discovery
-}
-
 func NewRouter(cfg config.Config) http.Handler {
-	handler := NewHandler(cfg)
-
-	router := chi.NewRouter()
-	router.Get("/", handler.version)
-	router.Post("/auth/tokens", handler.createToken)
-
-	return router
+	return NewHandler(cfg).Router()
 }
 
 func NewHandler(cfg config.Config) Handler {
@@ -33,6 +23,18 @@ func NewHandler(cfg config.Config) Handler {
 		service: appidentity.NewService(cfg),
 		config:  cfg,
 	}
+}
+
+func (h Handler) Discovery() http.HandlerFunc {
+	return h.discovery
+}
+
+func (h Handler) Router() http.Handler {
+	router := chi.NewRouter()
+	router.Get("/", h.version)
+	router.Post("/auth/tokens", h.createToken)
+
+	return router
 }
 
 func (h Handler) baseURL(r *http.Request) string {

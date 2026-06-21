@@ -13,12 +13,13 @@ import (
 func NewRouter(cfg config.Config) http.Handler {
 	router := chi.NewRouter()
 	router.Use(requestID)
+	identityHandler := identity.NewHandler(cfg)
 
 	router.Mount("/_sandstack", admin.NewRouter())
 
-	router.Get("/identity", identity.Discovery(cfg))
-	router.Get("/identity/", identity.Discovery(cfg))
-	router.Mount("/identity/v3", identity.NewRouter(cfg))
+	router.Get("/identity", identityHandler.Discovery())
+	router.Get("/identity/", identityHandler.Discovery())
+	router.Mount("/identity/v3", identityHandler.Router())
 
 	return router
 }
