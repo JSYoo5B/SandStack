@@ -2,17 +2,36 @@ package identity
 
 import "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 
+type catalogService struct {
+	id          string
+	serviceType string
+	path        string
+}
+
 func (s Service) Catalog(baseURL string) []tokens.CatalogEntry {
 	projectID := s.config.ProjectID
 
-	return []tokens.CatalogEntry{
+	catalog := []tokens.CatalogEntry{
 		s.service("identity", "identity", baseURL+"/identity/v3"),
-		s.service("compute", "compute", baseURL+"/compute/v2.1/"+projectID),
-		s.service("network", "network", baseURL+"/network/v2.0"),
-		s.service("image", "image", baseURL+"/image/v2"),
-		s.service("volumev3", "volumev3", baseURL+"/volume/v3/"+projectID),
-		s.service("placement", "placement", baseURL+"/placement"),
 	}
+
+	optionalServices := []catalogService{
+		{id: "compute", serviceType: "compute", path: "/compute/v2.1/" + projectID},
+		{id: "network", serviceType: "network", path: "/network/v2.0"},
+		{id: "image", serviceType: "image", path: "/image/v2"},
+		{id: "volumev3", serviceType: "volumev3", path: "/volume/v3/" + projectID},
+		{id: "placement", serviceType: "placement", path: "/placement"},
+	}
+
+	for _, service := range optionalServices {
+		catalog = append(catalog, s.service(
+			service.id,
+			service.serviceType,
+			baseURL+service.path,
+		))
+	}
+
+	return catalog
 }
 
 func (s Service) service(id, serviceType, url string) tokens.CatalogEntry {
