@@ -8,6 +8,7 @@ import (
 )
 
 var ErrNetworkNotFound = errors.New("network not found")
+var ErrSubnetNotFound = errors.New("subnet not found")
 
 type Service struct {
 	mu        sync.RWMutex
@@ -141,4 +142,52 @@ func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
 	}
 
 	return subnet
+}
+
+func (s *Service) GetSubnet(id string) (Subnet, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	subnet, ok := s.subnets[id]
+	if !ok {
+		return Subnet{}, ErrSubnetNotFound
+	}
+
+	return subnet, nil
+}
+
+func (s *Service) DeleteSubnet(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	subnet, ok := s.subnets[id]
+	if !ok {
+		return ErrSubnetNotFound
+	}
+
+	delete(s.subnets, id)
+	for index, currentID := range s.subnetIDs {
+		if currentID == id {
+			s.subnetIDs = append(s.subnetIDs[:index], s.subnetIDs[index+1:]...)
+			break
+		}
+	}
+
+	network, ok := s.networks[subnet.NetworkID]
+	if ok {
+		network.Subnets = removeString(network.Subnets, id)
+		s.networks[subnet.NetworkID] = network
+	}
+
+	return nil
+}
+
+func removeString(values []string, target string) []string {
+	for index, value := range values {
+		if value == target {
+			return append(values[:index], values[index+1:]...)
+		}
+	}
+
+	return values
 }

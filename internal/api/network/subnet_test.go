@@ -52,6 +52,39 @@ func (s *SubnetSuite) TestCreateSubnetThenListSubnets() {
 	s.Assert().Equal(network.ID, list[0].NetworkID)
 }
 
+func (s *SubnetSuite) TestGetSubnet() {
+	network := s.createNetwork("private")
+	created := s.createSubnet(network.ID, "private-subnet")
+
+	found, err := subnets.Get(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	s.Assert().Equal(created.ID, found.ID)
+	s.Assert().Equal(network.ID, found.NetworkID)
+	s.Assert().Equal("private-subnet", found.Name)
+}
+
+func (s *SubnetSuite) TestDeleteSubnet() {
+	network := s.createNetwork("private")
+	created := s.createSubnet(network.ID, "private-subnet")
+
+	err := subnets.Delete(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	list := s.listSubnets()
+
+	s.Assert().Empty(list)
+}
+
 func (s *SubnetSuite) listSubnets() []subnets.Subnet {
 	pages, err := subnets.List(
 		testhelper.ServiceClient(s.server.URL),
