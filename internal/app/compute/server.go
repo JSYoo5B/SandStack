@@ -9,6 +9,8 @@ import (
 
 var ErrServerNotFound = errors.New("server not found")
 
+const serverTimestampFormat = time.RFC3339
+
 func (s *Service) ListServers() []Server {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -22,7 +24,7 @@ func (s *Service) ListServers() []Server {
 }
 
 func (s *Service) CreateServer(input CreateServer) Server {
-	now := time.Now().UTC().Format(time.RFC3339)
+	now := s.clock.Now().UTC().Format(serverTimestampFormat)
 	server := Server{
 		ID:        "srv-" + idgen.RandomHex(16),
 		Name:      input.Name,

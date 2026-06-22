@@ -1,15 +1,24 @@
 package compute
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
+)
 
 type Service struct {
 	flavors []Flavor
 	mu      sync.RWMutex
 	ids     []string
 	servers map[string]Server
+	clock   clock.Clock
 }
 
 func NewService() *Service {
+	return NewServiceWithClock(clock.Wall())
+}
+
+func NewServiceWithClock(clock clock.Clock) *Service {
 	return &Service{
 		flavors: []Flavor{
 			{
@@ -28,5 +37,6 @@ func NewService() *Service {
 		},
 		ids:     []string{},
 		servers: map[string]Server{},
+		clock:   clock,
 	}
 }
