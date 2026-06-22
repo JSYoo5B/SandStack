@@ -15,6 +15,22 @@ type Flavor struct {
 }
 
 type Server struct {
-	ID   string
-	Name string
+	ID        string
+	Name      string
+	ImageID   string
+	FlavorID  string
+	TenantID  string
+	UserID    string
+	Status    string
+	Progress  int
+	CreatedAt string
+	UpdatedAt string
+	Metadata  map[string]string
+}
+
+type CreateServer struct {
+	Name     string
+	ImageID  string
+	FlavorID string
+	Metadata map[string]string
 }
