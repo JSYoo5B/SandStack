@@ -32,7 +32,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          commits="$(git rev-list --reverse HEAD)"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+          fi
+
+          if [[ "$base" =~ ^0+$ ]]; then
+            commits="$(git rev-list --reverse "$head")"
+          else
+            commits="$(git rev-list --reverse "$base..$head")"
+          fi
 
           if [[ -z "$commits" ]]; then
             echo "No commits to verify."
