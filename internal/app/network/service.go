@@ -191,3 +191,7 @@ func removeString(values []string, target string) []string {
 
 	return values
 }
+
+func (s *Service) ListPorts() []Port {
+	return []Port{}
+}

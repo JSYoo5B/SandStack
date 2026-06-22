@@ -57,3 +57,9 @@ type HostRoute struct {
 	DestinationCIDR string
 	NextHop         string
 }
+
+type Port struct {
+	ID        string
+	NetworkID string
+	Name      string
+}
