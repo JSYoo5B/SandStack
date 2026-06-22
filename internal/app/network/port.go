@@ -2,8 +2,6 @@ package network
 
 import (
 	"errors"
-
-	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 var ErrPortNotFound = errors.New("port not found")
@@ -26,7 +24,7 @@ func (s *Service) CreatePort(input CreatePort) Port {
 		adminStateUp = *input.AdminStateUp
 	}
 
-	id := "port-" + idgen.RandomHex(16)
+	id := "port-" + s.idGen.Hex(16)
 	port := Port{
 		ID:           id,
 		NetworkID:    input.NetworkID,
@@ -34,7 +32,7 @@ func (s *Service) CreatePort(input CreatePort) Port {
 		Description:  input.Description,
 		AdminStateUp: adminStateUp,
 		Status:       "DOWN",
-		MACAddress:   "fa:16:3e:" + idgen.RandomHex(6),
+		MACAddress:   "fa:16:3e:" + s.idGen.Hex(6),
 		FixedIPs:     input.FixedIPs,
 		TenantID:     input.ProjectID,
 		ProjectID:    input.ProjectID,
