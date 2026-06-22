@@ -1,11 +1,20 @@
 package compute
 
-import "errors"
+import (
+	"errors"
+	"sync"
+	"time"
+
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+)
 
 var ErrFlavorNotFound = errors.New("flavor not found")
 
 type Service struct {
 	flavors []Flavor
+	mu      sync.RWMutex
+	ids     []string
+	servers map[string]Server
 }
 
 func NewService() *Service {
@@ -25,6 +34,8 @@ func NewService() *Service {
 				ExtraSpecs:  map[string]string{},
 			},
 		},
+		ids:     []string{},
+		servers: map[string]Server{},
 	}
 }
 
@@ -46,5 +57,38 @@ func (s *Service) GetFlavor(id string) (Flavor, error) {
 }
 
 func (s *Service) ListServers() []Server {
-	return []Server{}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	servers := make([]Server, 0, len(s.ids))
+	for _, id := range s.ids {
+		servers = append(servers, s.servers[id])
+	}
+
+	return servers
+}
+
+func (s *Service) CreateServer(input CreateServer) Server {
+	now := time.Now().UTC().Format(time.RFC3339)
+	server := Server{
+		ID:        "srv-" + idgen.RandomHex(16),
+		Name:      input.Name,
+		ImageID:   input.ImageID,
+		FlavorID:  input.FlavorID,
+		TenantID:  "demo",
+		UserID:    "admin",
+		Status:    "BUILD",
+		Progress:  0,
+		CreatedAt: now,
+		UpdatedAt: now,
+		Metadata:  input.Metadata,
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.ids = append(s.ids, server.ID)
+	s.servers[server.ID] = server
+
+	return server
 }
