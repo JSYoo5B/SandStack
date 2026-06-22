@@ -36,17 +36,7 @@ func (s *ImageSuite) TestListImages() {
 }
 
 func (s *ImageSuite) TestCreateImageThenListImages() {
-	created, err := images.Create(
-		s.T().Context(),
-		testhelper.ServiceClient(s.server.URL),
-		images.CreateOpts{
-			Name:            "ubuntu",
-			ContainerFormat: "bare",
-			DiskFormat:      "qcow2",
-		},
-	).Extract()
-	s.Require().NoError(err)
-	s.Require().NotNil(created)
+	created := s.createImage("ubuntu")
 
 	list := s.listImages()
 
@@ -56,6 +46,36 @@ func (s *ImageSuite) TestCreateImageThenListImages() {
 	s.Require().Len(list, 1)
 	s.Assert().Equal(created.ID, list[0].ID)
 	s.Assert().Equal("ubuntu", list[0].Name)
+}
+
+func (s *ImageSuite) TestGetImage() {
+	created := s.createImage("ubuntu")
+
+	found, err := images.Get(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	s.Assert().Equal(created.ID, found.ID)
+	s.Assert().Equal("ubuntu", found.Name)
+}
+
+func (s *ImageSuite) TestDeleteImage() {
+	created := s.createImage("ubuntu")
+
+	err := images.Delete(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	list := s.listImages()
+
+	s.Assert().Empty(list)
 }
 
 func (s *ImageSuite) listImages() []images.Image {
@@ -69,4 +89,20 @@ func (s *ImageSuite) listImages() []images.Image {
 	s.Require().NoError(err)
 
 	return list
+}
+
+func (s *ImageSuite) createImage(name string) *images.Image {
+	created, err := images.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		images.CreateOpts{
+			Name:            name,
+			ContainerFormat: "bare",
+			DiskFormat:      "qcow2",
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	return created
 }

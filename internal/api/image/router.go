@@ -29,6 +29,8 @@ func (h Handler) Router() http.Handler {
 	router.Get("/", h.versions)
 	router.Get("/images", h.listImages)
 	router.Post("/images", h.createImage)
+	router.Get("/images/{image_id}", h.getImage)
+	router.Delete("/images/{image_id}", h.deleteImage)
 
 	return router
 }
