@@ -9,6 +9,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
 	"github.com/JSYoo5B/SandStack/internal/testhelper"
 	"github.com/gophercloud/gophercloud/v2/openstack"
+	"github.com/gophercloud/gophercloud/v2/openstack/image/v2/images"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -48,4 +49,38 @@ func (s *RouterSuite) TestMountedIdentityPasswordAuth() {
 	s.Require().NoError(err)
 
 	s.Assert().NotEmpty(provider.TokenID)
+}
+
+func (s *RouterSuite) TestMountedSandstackResetClearsState() {
+	created, err := images.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/image/v2"),
+		images.CreateOpts{
+			Name:            "ubuntu",
+			ContainerFormat: "bare",
+			DiskFormat:      "qcow2",
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	response, err := http.Post(
+		s.server.URL+"/_sandstack/reset",
+		"application/json",
+		nil,
+	)
+	s.Require().NoError(err)
+	defer response.Body.Close()
+
+	pages, err := images.List(
+		testhelper.ServiceClient(s.server.URL+"/image/v2"),
+		nil,
+	).AllPages(s.T().Context())
+	s.Require().NoError(err)
+
+	list, err := images.ExtractImages(pages)
+	s.Require().NoError(err)
+
+	s.Assert().Equal(http.StatusNoContent, response.StatusCode)
+	s.Assert().Empty(list)
 }
