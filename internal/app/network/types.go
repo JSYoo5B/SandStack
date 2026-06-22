@@ -19,3 +19,9 @@ type Network struct {
 	ProjectID    string
 	Shared       bool
 }
+
+type Subnet struct {
+	ID        string
+	NetworkID string
+	Name      string
+}

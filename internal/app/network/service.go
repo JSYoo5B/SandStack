@@ -91,3 +91,7 @@ func (s *Service) Delete(id string) error {
 
 	return nil
 }
+
+func (s *Service) ListSubnets() []Subnet {
+	return []Subnet{}
+}
