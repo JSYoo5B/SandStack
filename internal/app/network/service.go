@@ -9,6 +9,7 @@ import (
 
 var ErrNetworkNotFound = errors.New("network not found")
 var ErrSubnetNotFound = errors.New("subnet not found")
+var ErrPortNotFound = errors.New("port not found")
 
 type Service struct {
 	mu        sync.RWMutex
@@ -237,4 +238,35 @@ func (s *Service) CreatePort(input CreatePort) Port {
 	s.ports[port.ID] = port
 
 	return port
+}
+
+func (s *Service) GetPort(id string) (Port, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	port, ok := s.ports[id]
+	if !ok {
+		return Port{}, ErrPortNotFound
+	}
+
+	return port, nil
+}
+
+func (s *Service) DeletePort(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.ports[id]; !ok {
+		return ErrPortNotFound
+	}
+
+	delete(s.ports, id)
+	for index, currentID := range s.portIDs {
+		if currentID == id {
+			s.portIDs = append(s.portIDs[:index], s.portIDs[index+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
