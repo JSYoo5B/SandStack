@@ -67,3 +67,19 @@ func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 	s.Assert().Equal(100, found.Progress)
 	s.Assert().Equal("2026-06-23T08:30:00Z", found.UpdatedAt)
 }
+
+func (s *ServerSuite) TestResetClearsServers() {
+	service := compute.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("server-id"),
+	)
+	service.CreateServer(compute.CreateServer{
+		Name:     "web",
+		ImageID:  "img-1",
+		FlavorID: "1",
+	})
+
+	service.Reset()
+
+	s.Assert().Empty(service.ListServers())
+}

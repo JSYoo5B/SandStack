@@ -50,3 +50,11 @@ func NewServiceWithRuntime(
 		idGen:   idGen,
 	}
 }
+
+func (s *Service) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.ids = []string{}
+	s.servers = map[string]Server{}
+}

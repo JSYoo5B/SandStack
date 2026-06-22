@@ -32,3 +32,15 @@ func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
 		idGen:     idGen,
 	}
 }
+
+func (s *Service) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.ids = []string{}
+	s.networks = map[string]Network{}
+	s.subnetIDs = []string{}
+	s.subnets = map[string]Subnet{}
+	s.portIDs = []string{}
+	s.ports = map[string]Port{}
+}

@@ -107,3 +107,11 @@ func (s *Service) Delete(id string) error {
 
 	return nil
 }
+
+func (s *Service) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.ids = []string{}
+	s.images = map[string]Image{}
+}

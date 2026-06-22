@@ -46,3 +46,16 @@ func (s *ServiceSuite) TestCreatePortUsesInjectedIDGenerator() {
 	s.Assert().Equal("port-port-id", created.ID)
 	s.Assert().Equal("fa:16:3e:port-id", created.MACAddress)
 }
+
+func (s *ServiceSuite) TestResetClearsNetworkResources() {
+	service := network.NewServiceWithIDGenerator(idgen.Fixed("network-id"))
+	created := service.Create(network.CreateNetwork{Name: "private"})
+	service.CreateSubnet(network.CreateSubnet{NetworkID: created.ID})
+	service.CreatePort(network.CreatePort{NetworkID: created.ID})
+
+	service.Reset()
+
+	s.Assert().Empty(service.List())
+	s.Assert().Empty(service.ListSubnets())
+	s.Assert().Empty(service.ListPorts())
+}
