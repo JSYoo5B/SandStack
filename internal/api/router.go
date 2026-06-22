@@ -9,6 +9,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/api/image"
 	"github.com/JSYoo5B/SandStack/internal/api/network"
 	"github.com/JSYoo5B/SandStack/internal/api/placement"
+	"github.com/JSYoo5B/SandStack/internal/api/volume"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	"github.com/go-chi/chi/v5"
@@ -29,6 +30,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Mount("/image/v2", image.NewRouter(cfg))
 	router.Mount("/network/v2.0", network.NewRouter(cfg))
 	router.Mount("/placement", placement.NewRouter(cfg))
+	router.Mount("/volume/v3", volume.NewRouter(cfg))
 
 	return router
 }
