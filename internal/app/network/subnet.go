@@ -2,8 +2,6 @@ package network
 
 import (
 	"errors"
-
-	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 var ErrSubnetNotFound = errors.New("subnet not found")
@@ -27,7 +25,7 @@ func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
 	}
 
 	subnet := Subnet{
-		ID:             "subnet-" + idgen.RandomHex(16),
+		ID:             "subnet-" + s.idGen.Hex(16),
 		NetworkID:      input.NetworkID,
 		Name:           input.Name,
 		Description:    input.Description,
