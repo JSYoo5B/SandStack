@@ -36,6 +36,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/subnets/{subnet_id}", h.getSubnet)
 	router.Delete("/subnets/{subnet_id}", h.deleteSubnet)
 	router.Get("/ports", h.listPorts)
+	router.Post("/ports", h.createPort)
 
 	return router
 }
