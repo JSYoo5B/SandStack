@@ -10,8 +10,10 @@ var ErrServerNotFound = errors.New("server not found")
 const serverTimestampFormat = time.RFC3339
 
 func (s *Service) ListServers() []Server {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.activateServersLocked()
 
 	servers := make([]Server, 0, len(s.ids))
 	for _, id := range s.ids {
@@ -47,13 +49,16 @@ func (s *Service) CreateServer(input CreateServer) Server {
 }
 
 func (s *Service) GetServer(id string) (Server, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	server, ok := s.servers[id]
 	if !ok {
 		return Server{}, ErrServerNotFound
 	}
+
+	server = s.activateServerLocked(server)
+	s.servers[id] = server
 
 	return server, nil
 }
@@ -75,4 +80,22 @@ func (s *Service) DeleteServer(id string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) activateServersLocked() {
+	for _, id := range s.ids {
+		s.servers[id] = s.activateServerLocked(s.servers[id])
+	}
+}
+
+func (s *Service) activateServerLocked(server Server) Server {
+	if server.Status != "BUILD" {
+		return server
+	}
+
+	server.Status = "ACTIVE"
+	server.Progress = 100
+	server.UpdatedAt = s.clock.Now().UTC().Format(serverTimestampFormat)
+
+	return server
 }
