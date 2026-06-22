@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/JSYoo5B/SandStack/internal/api/identity"
-	"github.com/JSYoo5B/SandStack/internal/api/testhelper"
+	"github.com/JSYoo5B/SandStack/internal/testhelper"
 	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 	"github.com/stretchr/testify/suite"
 )

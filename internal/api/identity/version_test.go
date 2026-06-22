@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/JSYoo5B/SandStack/internal/api/identity"
-	"github.com/JSYoo5B/SandStack/internal/api/testhelper"
+	"github.com/JSYoo5B/SandStack/internal/testhelper"
 	"github.com/stretchr/testify/suite"
 )
 
