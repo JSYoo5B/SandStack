@@ -11,17 +11,28 @@ import (
 const timestampFormat = "2006-01-02T15:04:05.999999"
 
 var ErrVolumeNotFound = errors.New("volume not found")
+var ErrVolumeTypeNotFound = errors.New("volume type not found")
 
 type Service struct {
-	mu      sync.RWMutex
-	ids     []string
-	volumes map[string]Volume
+	mu          sync.RWMutex
+	ids         []string
+	volumes     map[string]Volume
+	volumeTypes []VolumeType
 }
 
 func NewService() *Service {
 	return &Service{
 		ids:     []string{},
 		volumes: map[string]Volume{},
+		volumeTypes: []VolumeType{
+			{
+				ID:          "default",
+				Name:        "__DEFAULT__",
+				Description: "Default test volume type",
+				ExtraSpecs:  map[string]string{},
+				IsPublic:    true,
+			},
+		},
 	}
 }
 
@@ -90,4 +101,21 @@ func (s *Service) Delete(id string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) ListVolumeTypes() []VolumeType {
+	volumeTypes := make([]VolumeType, 0, len(s.volumeTypes))
+	volumeTypes = append(volumeTypes, s.volumeTypes...)
+
+	return volumeTypes
+}
+
+func (s *Service) GetVolumeType(id string) (VolumeType, error) {
+	for _, volumeType := range s.volumeTypes {
+		if volumeType.ID == id {
+			return volumeType, nil
+		}
+	}
+
+	return VolumeType{}, ErrVolumeTypeNotFound
 }

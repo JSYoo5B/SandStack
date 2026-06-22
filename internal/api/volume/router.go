@@ -32,6 +32,8 @@ func (h Handler) Router() http.Handler {
 	router.Post("/{project_id}/volumes", h.createVolume)
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)
 	router.Delete("/{project_id}/volumes/{volume_id}", h.deleteVolume)
+	router.Get("/{project_id}/types", h.listVolumeTypes)
+	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)
 
 	return router
 }
