@@ -1,6 +1,7 @@
 package volume
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -8,6 +9,8 @@ import (
 )
 
 const timestampFormat = "2006-01-02T15:04:05.999999"
+
+var ErrVolumeNotFound = errors.New("volume not found")
 
 type Service struct {
 	mu      sync.RWMutex
@@ -56,4 +59,35 @@ func (s *Service) List() []Volume {
 	}
 
 	return volumes
+}
+
+func (s *Service) Get(id string) (Volume, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	volume, ok := s.volumes[id]
+	if !ok {
+		return Volume{}, ErrVolumeNotFound
+	}
+
+	return volume, nil
+}
+
+func (s *Service) Delete(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.volumes[id]; !ok {
+		return ErrVolumeNotFound
+	}
+
+	delete(s.volumes, id)
+	for index, currentID := range s.ids {
+		if currentID == id {
+			s.ids = append(s.ids[:index], s.ids[index+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
