@@ -30,6 +30,36 @@ func (s *VolumeSuite) TearDownTest() {
 }
 
 func (s *VolumeSuite) TestListVolumes() {
+	list := s.listVolumes()
+
+	s.Assert().Empty(list)
+}
+
+func (s *VolumeSuite) TestCreateVolumeThenListVolumes() {
+	created, err := volumes.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		volumes.CreateOpts{
+			Size: 1,
+			Name: "database",
+		},
+		nil,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	list := s.listVolumes()
+
+	s.Assert().NotEmpty(created.ID)
+	s.Assert().Equal("database", created.Name)
+	s.Assert().Equal(1, created.Size)
+	s.Assert().Equal("creating", created.Status)
+	s.Require().Len(list, 1)
+	s.Assert().Equal(created.ID, list[0].ID)
+	s.Assert().Equal("database", list[0].Name)
+}
+
+func (s *VolumeSuite) listVolumes() []volumes.Volume {
 	pages, err := volumes.List(
 		testhelper.ServiceClient(s.server.URL+"/demo"),
 		nil,
@@ -39,5 +69,5 @@ func (s *VolumeSuite) TestListVolumes() {
 	list, err := volumes.ExtractVolumes(pages)
 	s.Require().NoError(err)
 
-	s.Assert().Empty(list)
+	return list
 }
