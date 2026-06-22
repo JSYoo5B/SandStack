@@ -23,6 +23,7 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/{project_id}", h.version)
 	router.Get("/{project_id}/", h.version)
+	router.Get("/{project_id}/volumes/detail", h.listVolumes)
 
 	return router
 }
