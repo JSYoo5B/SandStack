@@ -36,17 +36,7 @@ func (s *VolumeSuite) TestListVolumes() {
 }
 
 func (s *VolumeSuite) TestCreateVolumeThenListVolumes() {
-	created, err := volumes.Create(
-		s.T().Context(),
-		testhelper.ServiceClient(s.server.URL+"/demo"),
-		volumes.CreateOpts{
-			Size: 1,
-			Name: "database",
-		},
-		nil,
-	).Extract()
-	s.Require().NoError(err)
-	s.Require().NotNil(created)
+	created := s.createVolume("database")
 
 	list := s.listVolumes()
 
@@ -57,6 +47,37 @@ func (s *VolumeSuite) TestCreateVolumeThenListVolumes() {
 	s.Require().Len(list, 1)
 	s.Assert().Equal(created.ID, list[0].ID)
 	s.Assert().Equal("database", list[0].Name)
+}
+
+func (s *VolumeSuite) TestGetVolume() {
+	created := s.createVolume("database")
+
+	found, err := volumes.Get(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	s.Assert().Equal(created.ID, found.ID)
+	s.Assert().Equal("database", found.Name)
+}
+
+func (s *VolumeSuite) TestDeleteVolume() {
+	created := s.createVolume("database")
+
+	err := volumes.Delete(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		created.ID,
+		volumes.DeleteOpts{},
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	list := s.listVolumes()
+
+	s.Assert().Empty(list)
 }
 
 func (s *VolumeSuite) listVolumes() []volumes.Volume {
@@ -70,4 +91,20 @@ func (s *VolumeSuite) listVolumes() []volumes.Volume {
 	s.Require().NoError(err)
 
 	return list
+}
+
+func (s *VolumeSuite) createVolume(name string) *volumes.Volume {
+	created, err := volumes.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		volumes.CreateOpts{
+			Size: 1,
+			Name: name,
+		},
+		nil,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	return created
 }
