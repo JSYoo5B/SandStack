@@ -44,3 +44,22 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 
 	s.Assert().Equal("vol-volume-id", created.ID)
 }
+
+func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
+	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(now),
+		idgen.Fixed("volume-id"),
+	)
+	created := service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	found, err := service.Get(created.ID)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("creating", created.Status)
+	s.Assert().Equal("available", found.Status)
+	s.Assert().Equal("2026-06-23T08:30:00.123456", found.UpdatedAt)
+}
