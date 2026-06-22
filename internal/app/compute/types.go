@@ -13,3 +13,8 @@ type Flavor struct {
 	Description string
 	ExtraSpecs  map[string]string
 }
+
+type Server struct {
+	ID   string
+	Name string
+}

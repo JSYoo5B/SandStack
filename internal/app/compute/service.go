@@ -44,3 +44,7 @@ func (s *Service) GetFlavor(id string) (Flavor, error) {
 
 	return Flavor{}, ErrFlavorNotFound
 }
+
+func (s *Service) ListServers() []Server {
+	return []Server{}
+}
