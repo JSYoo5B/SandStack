@@ -11,6 +11,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/api/placement"
 	"github.com/JSYoo5B/SandStack/internal/api/volume"
 	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+	"github.com/JSYoo5B/SandStack/internal/app/fault"
 	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/app/requestlog"
@@ -23,6 +24,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	router := chi.NewRouter()
 	router.Use(requestID)
 	requests := requestlog.NewService()
+	faults := fault.NewService()
 	router.Use(recordRequests(requests))
 	identityHandler := identity.NewHandler(cfg)
 	computeService := appcompute.NewService()
@@ -36,7 +38,8 @@ func NewRouter(cfg config.Config) http.Handler {
 		networkService.Reset()
 		volumeService.Reset()
 		requests.Reset()
-	}, requests))
+		faults.Reset()
+	}, requests, faults))
 
 	router.Get("/identity", identityHandler.Discovery())
 	router.Get("/identity/", identityHandler.Discovery())
