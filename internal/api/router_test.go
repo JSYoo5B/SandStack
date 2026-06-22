@@ -7,6 +7,8 @@ import (
 
 	"github.com/JSYoo5B/SandStack/internal/api"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/testhelper"
+	"github.com/gophercloud/gophercloud/v2/openstack"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -33,4 +35,17 @@ func (s *RouterSuite) TestRootIsNotExposed() {
 	defer response.Body.Close()
 
 	s.Assert().Equal(http.StatusNotFound, response.StatusCode)
+}
+
+func (s *RouterSuite) TestMountedIdentityPasswordAuth() {
+	authOptions := testhelper.PasswordAuthOptions()
+	authOptions.IdentityEndpoint = s.server.URL + "/identity/v3"
+
+	provider, err := openstack.AuthenticatedClient(
+		s.T().Context(),
+		*authOptions,
+	)
+	s.Require().NoError(err)
+
+	s.Assert().NotEmpty(provider.TokenID)
 }
