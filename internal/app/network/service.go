@@ -10,15 +10,19 @@ import (
 var ErrNetworkNotFound = errors.New("network not found")
 
 type Service struct {
-	mu       sync.RWMutex
-	ids      []string
-	networks map[string]Network
+	mu        sync.RWMutex
+	ids       []string
+	networks  map[string]Network
+	subnetIDs []string
+	subnets   map[string]Subnet
 }
 
 func NewService() *Service {
 	return &Service{
-		ids:      []string{},
-		networks: map[string]Network{},
+		ids:       []string{},
+		networks:  map[string]Network{},
+		subnetIDs: []string{},
+		subnets:   map[string]Subnet{},
 	}
 }
 
@@ -93,5 +97,48 @@ func (s *Service) Delete(id string) error {
 }
 
 func (s *Service) ListSubnets() []Subnet {
-	return []Subnet{}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	subnets := make([]Subnet, 0, len(s.subnetIDs))
+	for _, id := range s.subnetIDs {
+		subnets = append(subnets, s.subnets[id])
+	}
+
+	return subnets
+}
+
+func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
+	enableDHCP := true
+	if input.EnableDHCP != nil {
+		enableDHCP = *input.EnableDHCP
+	}
+
+	subnet := Subnet{
+		ID:             "subnet-" + idgen.RandomHex(16),
+		NetworkID:      input.NetworkID,
+		Name:           input.Name,
+		Description:    input.Description,
+		IPVersion:      input.IPVersion,
+		CIDR:           input.CIDR,
+		GatewayIP:      input.GatewayIP,
+		DNSNameservers: input.DNSNameservers,
+		EnableDHCP:     enableDHCP,
+		TenantID:       input.ProjectID,
+		ProjectID:      input.ProjectID,
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.subnetIDs = append(s.subnetIDs, subnet.ID)
+	s.subnets[subnet.ID] = subnet
+
+	network, ok := s.networks[subnet.NetworkID]
+	if ok {
+		network.Subnets = append(network.Subnets, subnet.ID)
+		s.networks[subnet.NetworkID] = network
+	}
+
+	return subnet
 }
