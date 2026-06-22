@@ -63,3 +63,18 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 	s.Assert().Equal("available", found.Status)
 	s.Assert().Equal("2026-06-23T08:30:00.123456", found.UpdatedAt)
 }
+
+func (s *VolumeSuite) TestResetClearsVolumes() {
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("volume-id"),
+	)
+	service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	service.Reset()
+
+	s.Assert().Empty(service.List())
+}

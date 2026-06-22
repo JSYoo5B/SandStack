@@ -46,3 +46,19 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 
 	s.Assert().Equal("img-image-id", created.ID)
 }
+
+func (s *ServiceSuite) TestResetClearsImages() {
+	service := image.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("image-id"),
+	)
+	service.Create(image.CreateImage{
+		Name:            "ubuntu",
+		ContainerFormat: "bare",
+		DiskFormat:      "qcow2",
+	})
+
+	service.Reset()
+
+	s.Assert().Empty(service.List())
+}
