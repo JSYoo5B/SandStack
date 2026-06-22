@@ -54,6 +54,17 @@ func (s *TokenSuite) TestPasswordAuth() {
 	s.Assert().Equal("admin", user.Name)
 	s.Assert().Equal("demo", project.Name)
 	s.Assert().Equal(
+		map[string]bool{
+			"identity":  true,
+			"compute":   true,
+			"network":   true,
+			"image":     true,
+			"volumev3":  true,
+			"placement": true,
+		},
+		catalogServices(catalog.Entries),
+	)
+	s.Assert().Equal(
 		s.server.URL+"/compute/v2.1/demo",
 		computeEndpoint(catalog.Entries),
 	)
@@ -73,4 +84,13 @@ func computeEndpoint(catalog []tokens.CatalogEntry) string {
 	}
 
 	return ""
+}
+
+func catalogServices(catalog []tokens.CatalogEntry) map[string]bool {
+	services := make(map[string]bool, len(catalog))
+	for _, entry := range catalog {
+		services[entry.Type] = true
+	}
+
+	return services
 }
