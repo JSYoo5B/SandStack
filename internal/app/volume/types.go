@@ -22,3 +22,11 @@ type Volume struct {
 	Encrypted   bool
 	Multiattach bool
 }
+
+type VolumeType struct {
+	ID          string
+	Name        string
+	Description string
+	ExtraSpecs  map[string]string
+	IsPublic    bool
+}
