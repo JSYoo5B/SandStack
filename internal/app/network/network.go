@@ -2,8 +2,6 @@ package network
 
 import (
 	"errors"
-
-	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 var ErrNetworkNotFound = errors.New("network not found")
@@ -15,7 +13,7 @@ func (s *Service) Create(input CreateNetwork) Network {
 	}
 
 	network := Network{
-		ID:           "net-" + idgen.RandomHex(16),
+		ID:           "net-" + s.idGen.Hex(16),
 		Name:         input.Name,
 		Description:  input.Description,
 		AdminStateUp: adminStateUp,
