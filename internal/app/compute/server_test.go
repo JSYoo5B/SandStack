@@ -46,3 +46,24 @@ func (s *ServerSuite) TestCreateServerUsesInjectedIDGenerator() {
 
 	s.Assert().Equal("srv-server-id", server.ID)
 }
+
+func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
+	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
+	service := compute.NewServiceWithRuntime(
+		clock.Fixed(now),
+		idgen.Fixed("server-id"),
+	)
+	created := service.CreateServer(compute.CreateServer{
+		Name:     "web",
+		ImageID:  "img-1",
+		FlavorID: "1",
+	})
+
+	found, err := service.GetServer(created.ID)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("BUILD", created.Status)
+	s.Assert().Equal("ACTIVE", found.Status)
+	s.Assert().Equal(100, found.Progress)
+	s.Assert().Equal("2026-06-23T08:30:00Z", found.UpdatedAt)
+}
