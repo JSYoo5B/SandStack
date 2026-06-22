@@ -32,6 +32,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/flavors/detail", h.listFlavors)
 	router.Get("/{project_id}/flavors/{flavor_id}", h.getFlavor)
 	router.Get("/{project_id}/servers", h.listServers)
+	router.Post("/{project_id}/servers", h.createServer)
 	router.Get("/{project_id}/servers/detail", h.listServers)
 
 	return router
