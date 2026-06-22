@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 type Service struct {
@@ -12,13 +13,21 @@ type Service struct {
 	ids     []string
 	servers map[string]Server
 	clock   clock.Clock
+	idGen   idgen.Generator
 }
 
 func NewService() *Service {
-	return NewServiceWithClock(clock.Wall())
+	return NewServiceWithRuntime(clock.Wall(), idgen.Random())
 }
 
 func NewServiceWithClock(clock clock.Clock) *Service {
+	return NewServiceWithRuntime(clock, idgen.Random())
+}
+
+func NewServiceWithRuntime(
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
 	return &Service{
 		flavors: []Flavor{
 			{
@@ -38,5 +47,6 @@ func NewServiceWithClock(clock clock.Clock) *Service {
 		ids:     []string{},
 		servers: map[string]Server{},
 		clock:   clock,
+		idGen:   idGen,
 	}
 }
