@@ -59,7 +59,32 @@ type HostRoute struct {
 }
 
 type Port struct {
-	ID        string
-	NetworkID string
-	Name      string
+	ID           string
+	NetworkID    string
+	Name         string
+	Description  string
+	AdminStateUp bool
+	Status       string
+	MACAddress   string
+	FixedIPs     []FixedIP
+	TenantID     string
+	ProjectID    string
+	DeviceID     string
+	DeviceOwner  string
+}
+
+type CreatePort struct {
+	NetworkID    string
+	Name         string
+	Description  string
+	AdminStateUp *bool
+	FixedIPs     []FixedIP
+	ProjectID    string
+	DeviceID     string
+	DeviceOwner  string
+}
+
+type FixedIP struct {
+	SubnetID  string
+	IPAddress string
 }

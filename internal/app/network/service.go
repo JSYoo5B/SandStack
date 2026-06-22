@@ -16,6 +16,8 @@ type Service struct {
 	networks  map[string]Network
 	subnetIDs []string
 	subnets   map[string]Subnet
+	portIDs   []string
+	ports     map[string]Port
 }
 
 func NewService() *Service {
@@ -24,6 +26,8 @@ func NewService() *Service {
 		networks:  map[string]Network{},
 		subnetIDs: []string{},
 		subnets:   map[string]Subnet{},
+		portIDs:   []string{},
+		ports:     map[string]Port{},
 	}
 }
 
@@ -193,5 +197,44 @@ func removeString(values []string, target string) []string {
 }
 
 func (s *Service) ListPorts() []Port {
-	return []Port{}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	ports := make([]Port, 0, len(s.portIDs))
+	for _, id := range s.portIDs {
+		ports = append(ports, s.ports[id])
+	}
+
+	return ports
+}
+
+func (s *Service) CreatePort(input CreatePort) Port {
+	adminStateUp := true
+	if input.AdminStateUp != nil {
+		adminStateUp = *input.AdminStateUp
+	}
+
+	id := "port-" + idgen.RandomHex(16)
+	port := Port{
+		ID:           id,
+		NetworkID:    input.NetworkID,
+		Name:         input.Name,
+		Description:  input.Description,
+		AdminStateUp: adminStateUp,
+		Status:       "DOWN",
+		MACAddress:   "fa:16:3e:" + idgen.RandomHex(6),
+		FixedIPs:     input.FixedIPs,
+		TenantID:     input.ProjectID,
+		ProjectID:    input.ProjectID,
+		DeviceID:     input.DeviceID,
+		DeviceOwner:  input.DeviceOwner,
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.portIDs = append(s.portIDs, port.ID)
+	s.ports[port.ID] = port
+
+	return port
 }
