@@ -50,7 +50,6 @@ region=RegionOne
 These endpoints must be available without OpenStack authentication:
 
 ```text
-GET  /
 GET  /identity/v3
 GET  /_sandstack/health
 GET  /_sandstack/ready

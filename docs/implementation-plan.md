@@ -27,7 +27,7 @@ Goal: a Gophercloud client can authenticate and discover service endpoints.
 - Add `cmd/sandstack-server`.
 - Add configuration defaults.
 - Add Chi root router.
-- Add `/`, `/_sandstack/health`, and `/_sandstack/ready`.
+- Add `/_sandstack/health` and `/_sandstack/ready`.
 - Add Identity router mounted at `/identity/v3`.
 - Add `POST /identity/v3/auth/tokens`.
 - Return a minimal service catalog.
