@@ -29,6 +29,8 @@ func (h Handler) Router() http.Handler {
 	router.Get("/", h.versions)
 	router.Get("/networks", h.listNetworks)
 	router.Post("/networks", h.createNetwork)
+	router.Get("/networks/{network_id}", h.getNetwork)
+	router.Delete("/networks/{network_id}", h.deleteNetwork)
 
 	return router
 }

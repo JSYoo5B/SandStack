@@ -1,10 +1,13 @@
 package network
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
+
+var ErrNetworkNotFound = errors.New("network not found")
 
 type Service struct {
 	mu       sync.RWMutex
@@ -56,4 +59,35 @@ func (s *Service) List() []Network {
 	}
 
 	return networks
+}
+
+func (s *Service) Get(id string) (Network, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	network, ok := s.networks[id]
+	if !ok {
+		return Network{}, ErrNetworkNotFound
+	}
+
+	return network, nil
+}
+
+func (s *Service) Delete(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.networks[id]; !ok {
+		return ErrNetworkNotFound
+	}
+
+	delete(s.networks, id)
+	for index, currentID := range s.ids {
+		if currentID == id {
+			s.ids = append(s.ids[:index], s.ids[index+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
