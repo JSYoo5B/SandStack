@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/JSYoo5B/SandStack/internal/api/admin"
+	"github.com/JSYoo5B/SandStack/internal/api/compute"
 	"github.com/JSYoo5B/SandStack/internal/api/identity"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
@@ -20,6 +21,8 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Get("/identity", identityHandler.Discovery())
 	router.Get("/identity/", identityHandler.Discovery())
 	router.Mount("/identity/v3", identityHandler.Router())
+
+	router.Mount("/compute/v2.1", compute.NewRouter(cfg))
 
 	return router
 }
