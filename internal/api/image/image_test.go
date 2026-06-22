@@ -30,6 +30,35 @@ func (s *ImageSuite) TearDownTest() {
 }
 
 func (s *ImageSuite) TestListImages() {
+	list := s.listImages()
+
+	s.Assert().Empty(list)
+}
+
+func (s *ImageSuite) TestCreateImageThenListImages() {
+	created, err := images.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		images.CreateOpts{
+			Name:            "ubuntu",
+			ContainerFormat: "bare",
+			DiskFormat:      "qcow2",
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	list := s.listImages()
+
+	s.Assert().NotEmpty(created.ID)
+	s.Assert().Equal("ubuntu", created.Name)
+	s.Assert().Equal(images.ImageStatus("queued"), created.Status)
+	s.Require().Len(list, 1)
+	s.Assert().Equal(created.ID, list[0].ID)
+	s.Assert().Equal("ubuntu", list[0].Name)
+}
+
+func (s *ImageSuite) listImages() []images.Image {
 	pages, err := images.List(
 		testhelper.ServiceClient(s.server.URL),
 		nil,
@@ -39,5 +68,5 @@ func (s *ImageSuite) TestListImages() {
 	list, err := images.ExtractImages(pages)
 	s.Require().NoError(err)
 
-	s.Assert().Empty(list)
+	return list
 }
