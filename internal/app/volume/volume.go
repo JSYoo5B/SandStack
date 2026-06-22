@@ -2,7 +2,6 @@ package volume
 
 import (
 	"errors"
-	"time"
 
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
@@ -12,7 +11,7 @@ const timestampFormat = "2006-01-02T15:04:05.999999"
 var ErrVolumeNotFound = errors.New("volume not found")
 
 func (s *Service) Create(input CreateVolume) Volume {
-	now := time.Now().UTC().Format(timestampFormat)
+	now := s.clock.Now().UTC().Format(timestampFormat)
 	volume := Volume{
 		ID:          "vol-" + idgen.RandomHex(16),
 		Status:      "creating",
