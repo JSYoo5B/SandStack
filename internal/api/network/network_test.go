@@ -36,16 +36,7 @@ func (s *NetworkSuite) TestListNetworks() {
 }
 
 func (s *NetworkSuite) TestCreateNetworkThenListNetworks() {
-	created, err := networks.Create(
-		s.T().Context(),
-		testhelper.ServiceClient(s.server.URL),
-		networks.CreateOpts{
-			Name:      "private",
-			ProjectID: "demo",
-		},
-	).Extract()
-	s.Require().NoError(err)
-	s.Require().NotNil(created)
+	created := s.createNetwork("private")
 
 	list := s.listNetworks()
 
@@ -55,6 +46,36 @@ func (s *NetworkSuite) TestCreateNetworkThenListNetworks() {
 	s.Require().Len(list, 1)
 	s.Assert().Equal(created.ID, list[0].ID)
 	s.Assert().Equal("private", list[0].Name)
+}
+
+func (s *NetworkSuite) TestGetNetwork() {
+	created := s.createNetwork("private")
+
+	found, err := networks.Get(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	s.Assert().Equal(created.ID, found.ID)
+	s.Assert().Equal("private", found.Name)
+}
+
+func (s *NetworkSuite) TestDeleteNetwork() {
+	created := s.createNetwork("private")
+
+	err := networks.Delete(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	list := s.listNetworks()
+
+	s.Assert().Empty(list)
 }
 
 func (s *NetworkSuite) listNetworks() []networks.Network {
@@ -68,4 +89,19 @@ func (s *NetworkSuite) listNetworks() []networks.Network {
 	s.Require().NoError(err)
 
 	return list
+}
+
+func (s *NetworkSuite) createNetwork(name string) *networks.Network {
+	created, err := networks.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		networks.CreateOpts{
+			Name:      name,
+			ProjectID: "demo",
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	return created
 }
