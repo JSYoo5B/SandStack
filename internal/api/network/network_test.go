@@ -30,6 +30,34 @@ func (s *NetworkSuite) TearDownTest() {
 }
 
 func (s *NetworkSuite) TestListNetworks() {
+	list := s.listNetworks()
+
+	s.Assert().Empty(list)
+}
+
+func (s *NetworkSuite) TestCreateNetworkThenListNetworks() {
+	created, err := networks.Create(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		networks.CreateOpts{
+			Name:      "private",
+			ProjectID: "demo",
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(created)
+
+	list := s.listNetworks()
+
+	s.Assert().NotEmpty(created.ID)
+	s.Assert().Equal("private", created.Name)
+	s.Assert().Equal("ACTIVE", created.Status)
+	s.Require().Len(list, 1)
+	s.Assert().Equal(created.ID, list[0].ID)
+	s.Assert().Equal("private", list[0].Name)
+}
+
+func (s *NetworkSuite) listNetworks() []networks.Network {
 	pages, err := networks.List(
 		testhelper.ServiceClient(s.server.URL),
 		nil,
@@ -39,5 +67,5 @@ func (s *NetworkSuite) TestListNetworks() {
 	list, err := networks.ExtractNetworks(pages)
 	s.Require().NoError(err)
 
-	s.Assert().Empty(list)
+	return list
 }
