@@ -22,6 +22,7 @@ func NewHandler(cfg config.Config) Handler {
 func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/", h.versions)
+	router.Get("/networks", h.listNetworks)
 
 	return router
 }
