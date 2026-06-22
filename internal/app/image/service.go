@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
@@ -14,17 +15,23 @@ type Service struct {
 	mu     sync.RWMutex
 	ids    []string
 	images map[string]Image
+	clock  clock.Clock
 }
 
 func NewService() *Service {
+	return NewServiceWithClock(clock.Wall())
+}
+
+func NewServiceWithClock(clock clock.Clock) *Service {
 	return &Service{
 		ids:    []string{},
 		images: map[string]Image{},
+		clock:  clock,
 	}
 }
 
 func (s *Service) Create(input CreateImage) Image {
-	now := time.Now().UTC()
+	now := s.clock.Now().UTC()
 	image := Image{
 		ID:              "img-" + idgen.RandomHex(16),
 		Name:            input.Name,
