@@ -3,11 +3,20 @@ package compute
 import (
 	"errors"
 	"time"
+
+	"github.com/JSYoo5B/SandStack/internal/app/fault"
 )
 
 var ErrServerNotFound = errors.New("server not found")
 
 const serverTimestampFormat = time.RFC3339
+
+func ServerCreateOperation() fault.Operation {
+	return fault.Operation{
+		Service: "compute",
+		Name:    "server.create",
+	}
+}
 
 func (s *Service) ListServers() []Server {
 	s.mu.Lock()

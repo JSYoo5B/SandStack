@@ -17,6 +17,12 @@ func (h Handler) listServers(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (h Handler) createServer(w http.ResponseWriter, r *http.Request) {
+	decision := h.faults.Evaluate(appcompute.ServerCreateOperation())
+	if decision.Matched {
+		respond.Error(w, decision.HTTPStatus, decision.Message)
+		return
+	}
+
 	var request createServerRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		respond.Error(w, http.StatusBadRequest, "invalid JSON request body")

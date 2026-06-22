@@ -45,7 +45,10 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Get("/identity/", identityHandler.Discovery())
 	router.Mount("/identity/v3", identityHandler.Router())
 
-	router.Mount("/compute/v2.1", compute.NewRouterWithService(cfg, computeService))
+	router.Mount(
+		"/compute/v2.1",
+		compute.NewRouterWithServiceAndFaults(cfg, computeService, faults),
+	)
 	router.Mount("/image/v2", image.NewRouterWithService(cfg, imageService))
 	router.Mount("/network/v2.0", network.NewRouterWithService(cfg, networkService))
 	router.Mount("/placement", placement.NewRouter(cfg))

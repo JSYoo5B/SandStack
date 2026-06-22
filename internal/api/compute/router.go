@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+	"github.com/JSYoo5B/SandStack/internal/app/fault"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
 	"github.com/go-chi/chi/v5"
 )
@@ -11,6 +12,7 @@ import (
 type Handler struct {
 	config  config.Config
 	service *appcompute.Service
+	faults  *fault.Service
 }
 
 func NewRouter(cfg config.Config) http.Handler {
@@ -21,20 +23,38 @@ func NewRouterWithService(
 	cfg config.Config,
 	service *appcompute.Service,
 ) http.Handler {
-	return NewHandlerWithService(cfg, service).Router()
+	return NewHandlerWithServiceAndFaults(
+		cfg,
+		service,
+		fault.NewService(),
+	).Router()
+}
+
+func NewRouterWithServiceAndFaults(
+	cfg config.Config,
+	service *appcompute.Service,
+	faults *fault.Service,
+) http.Handler {
+	return NewHandlerWithServiceAndFaults(cfg, service, faults).Router()
 }
 
 func NewHandler(cfg config.Config) Handler {
-	return NewHandlerWithService(cfg, appcompute.NewService())
+	return NewHandlerWithServiceAndFaults(
+		cfg,
+		appcompute.NewService(),
+		fault.NewService(),
+	)
 }
 
-func NewHandlerWithService(
+func NewHandlerWithServiceAndFaults(
 	cfg config.Config,
 	service *appcompute.Service,
+	faults *fault.Service,
 ) Handler {
 	return Handler{
 		config:  cfg,
 		service: service,
+		faults:  faults,
 	}
 }
 
