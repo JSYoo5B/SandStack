@@ -34,6 +34,8 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/servers", h.listServers)
 	router.Post("/{project_id}/servers", h.createServer)
 	router.Get("/{project_id}/servers/detail", h.listServers)
+	router.Get("/{project_id}/servers/{server_id}", h.getServer)
+	router.Delete("/{project_id}/servers/{server_id}", h.deleteServer)
 
 	return router
 }

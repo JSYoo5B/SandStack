@@ -75,6 +75,43 @@ func (s *ServerSuite) TestCreateServerThenListServers() {
 	s.Assert().Equal("test-server", list[0].Name)
 }
 
+func (s *ServerSuite) TestGetServer() {
+	created := s.createServer("test-server")
+
+	found, err := servers.Get(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	s.Assert().Equal(created.ID, found.ID)
+	s.Assert().Equal("test-server", found.Name)
+}
+
+func (s *ServerSuite) TestDeleteServer() {
+	created := s.createServer("test-server")
+
+	err := servers.Delete(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		created.ID,
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	pages, err := servers.List(
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		nil,
+	).AllPages(s.T().Context())
+	s.Require().NoError(err)
+
+	list, err := servers.ExtractServers(pages)
+	s.Require().NoError(err)
+
+	s.Assert().Empty(list)
+}
+
 func (s *ServerSuite) createServer(name string) *servers.Server {
 	created, err := servers.Create(
 		s.T().Context(),

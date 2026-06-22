@@ -9,6 +9,7 @@ import (
 )
 
 var ErrFlavorNotFound = errors.New("flavor not found")
+var ErrServerNotFound = errors.New("server not found")
 
 type Service struct {
 	flavors []Flavor
@@ -91,4 +92,35 @@ func (s *Service) CreateServer(input CreateServer) Server {
 	s.servers[server.ID] = server
 
 	return server
+}
+
+func (s *Service) GetServer(id string) (Server, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	server, ok := s.servers[id]
+	if !ok {
+		return Server{}, ErrServerNotFound
+	}
+
+	return server, nil
+}
+
+func (s *Service) DeleteServer(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.servers[id]; !ok {
+		return ErrServerNotFound
+	}
+
+	delete(s.servers, id)
+	for index, currentID := range s.ids {
+		if currentID == id {
+			s.ids = append(s.ids[:index], s.ids[index+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
