@@ -33,8 +33,10 @@ func (s *Service) Create(input CreateVolume) Volume {
 }
 
 func (s *Service) List() []Volume {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.makeVolumesAvailableLocked()
 
 	volumes := make([]Volume, 0, len(s.ids))
 	for _, id := range s.ids {
@@ -45,13 +47,16 @@ func (s *Service) List() []Volume {
 }
 
 func (s *Service) Get(id string) (Volume, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	volume, ok := s.volumes[id]
 	if !ok {
 		return Volume{}, ErrVolumeNotFound
 	}
+
+	volume = s.makeVolumeAvailableLocked(volume)
+	s.volumes[id] = volume
 
 	return volume, nil
 }
@@ -73,4 +78,21 @@ func (s *Service) Delete(id string) error {
 	}
 
 	return nil
+}
+
+func (s *Service) makeVolumesAvailableLocked() {
+	for _, id := range s.ids {
+		s.volumes[id] = s.makeVolumeAvailableLocked(s.volumes[id])
+	}
+}
+
+func (s *Service) makeVolumeAvailableLocked(volume Volume) Volume {
+	if volume.Status != "creating" {
+		return volume
+	}
+
+	volume.Status = "available"
+	volume.UpdatedAt = s.clock.Now().UTC().Format(timestampFormat)
+
+	return volume
 }
