@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -83,4 +84,37 @@ func (s *RouterSuite) TestMountedSandstackResetClearsState() {
 
 	s.Assert().Equal(http.StatusNoContent, response.StatusCode)
 	s.Assert().Empty(list)
+}
+
+func (s *RouterSuite) TestMountedSandstackRequestsRecordsOpenStackAPI() {
+	response, err := http.Get(s.server.URL + "/image/v2/images")
+	s.Require().NoError(err)
+	defer response.Body.Close()
+
+	requestsResponse, err := http.Get(s.server.URL + "/_sandstack/requests")
+	s.Require().NoError(err)
+	defer requestsResponse.Body.Close()
+
+	var body requestListResponse
+	err = json.NewDecoder(requestsResponse.Body).Decode(&body)
+	s.Require().NoError(err)
+
+	s.Assert().Equal(http.StatusOK, response.StatusCode)
+	s.Assert().Equal(http.StatusOK, requestsResponse.StatusCode)
+	s.Require().Len(body.Requests, 1)
+	s.Assert().NotEmpty(body.Requests[0].ID)
+	s.Assert().Equal(http.MethodGet, body.Requests[0].Method)
+	s.Assert().Equal("/image/v2/images", body.Requests[0].Path)
+	s.Assert().Equal(http.StatusOK, body.Requests[0].Status)
+}
+
+type requestListResponse struct {
+	Requests []requestDocument `json:"requests"`
+}
+
+type requestDocument struct {
+	ID     string `json:"id"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
+	Status int    `json:"status"`
 }
