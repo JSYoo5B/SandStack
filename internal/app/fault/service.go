@@ -1,6 +1,11 @@
 package fault
 
-import "sync"
+import (
+	"errors"
+	"sync"
+)
+
+var ErrRuleNotFound = errors.New("fault rule not found")
 
 type Service struct {
 	mu    sync.Mutex
@@ -32,6 +37,14 @@ func (s *Service) List() []Rule {
 	rules = append(rules, s.rules...)
 
 	return rules
+}
+
+func (s *Service) Enable(id string) error {
+	return s.setEnabled(id, true)
+}
+
+func (s *Service) Disable(id string) error {
+	return s.setEnabled(id, false)
 }
 
 func (s *Service) Reset() {
@@ -72,6 +85,21 @@ func (s *Service) Evaluate(operation Operation) Decision {
 	}
 
 	return Decision{}
+}
+
+func (s *Service) setEnabled(id string, enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for index, rule := range s.rules {
+		if rule.ID == id {
+			rule.Enabled = enabled
+			s.rules[index] = rule
+			return nil
+		}
+	}
+
+	return ErrRuleNotFound
 }
 
 func (s *Service) matches(rule Rule, operation Operation) bool {

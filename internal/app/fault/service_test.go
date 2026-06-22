@@ -62,6 +62,30 @@ func (s *ServiceSuite) TestEvaluateMatchesOnce() {
 	s.Assert().False(second.Matched)
 }
 
+func (s *ServiceSuite) TestDisableRule() {
+	service := fault.NewService()
+	service.Add(serverCreateRule(fault.Trigger{}))
+
+	err := service.Disable("rule-1")
+	s.Require().NoError(err)
+
+	decision := service.Evaluate(serverCreateOperation())
+	s.Assert().False(decision.Matched)
+}
+
+func (s *ServiceSuite) TestEnableRule() {
+	service := fault.NewService()
+	rule := serverCreateRule(fault.Trigger{})
+	rule.Enabled = false
+	service.Add(rule)
+
+	err := service.Enable("rule-1")
+	s.Require().NoError(err)
+
+	decision := service.Evaluate(serverCreateOperation())
+	s.Assert().True(decision.Matched)
+}
+
 func serverCreateRule(trigger fault.Trigger) fault.Rule {
 	return fault.Rule{
 		ID:        "rule-1",
