@@ -1,11 +1,14 @@
 package image
 
 import (
+	"errors"
 	"sync"
 	"time"
 
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
+
+var ErrImageNotFound = errors.New("image not found")
 
 type Service struct {
 	mu     sync.RWMutex
@@ -56,4 +59,35 @@ func (s *Service) List() []Image {
 	}
 
 	return images
+}
+
+func (s *Service) Get(id string) (Image, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	image, ok := s.images[id]
+	if !ok {
+		return Image{}, ErrImageNotFound
+	}
+
+	return image, nil
+}
+
+func (s *Service) Delete(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.images[id]; !ok {
+		return ErrImageNotFound
+	}
+
+	delete(s.images, id)
+	for index, currentID := range s.ids {
+		if currentID == id {
+			s.ids = append(s.ids[:index], s.ids[index+1:]...)
+			break
+		}
+	}
+
+	return nil
 }
