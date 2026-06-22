@@ -16,24 +16,33 @@ type Service struct {
 	ids    []string
 	images map[string]Image
 	clock  clock.Clock
+	idGen  idgen.Generator
 }
 
 func NewService() *Service {
-	return NewServiceWithClock(clock.Wall())
+	return NewServiceWithRuntime(clock.Wall(), idgen.Random())
 }
 
 func NewServiceWithClock(clock clock.Clock) *Service {
+	return NewServiceWithRuntime(clock, idgen.Random())
+}
+
+func NewServiceWithRuntime(
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
 	return &Service{
 		ids:    []string{},
 		images: map[string]Image{},
 		clock:  clock,
+		idGen:  idGen,
 	}
 }
 
 func (s *Service) Create(input CreateImage) Image {
 	now := s.clock.Now().UTC()
 	image := Image{
-		ID:              "img-" + idgen.RandomHex(16),
+		ID:              "img-" + s.idGen.Hex(16),
 		Name:            input.Name,
 		Status:          "queued",
 		ContainerFormat: input.ContainerFormat,
