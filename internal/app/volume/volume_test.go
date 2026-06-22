@@ -6,6 +6,7 @@ import (
 
 	"github.com/JSYoo5B/SandStack/internal/app/volume"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -28,4 +29,18 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 
 	s.Assert().Equal("2026-06-23T08:30:00.123456", created.CreatedAt)
 	s.Assert().Equal("2026-06-23T08:30:00.123456", created.UpdatedAt)
+}
+
+func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("volume-id"),
+	)
+
+	created := service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	s.Assert().Equal("vol-volume-id", created.ID)
 }
