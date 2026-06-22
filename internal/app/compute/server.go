@@ -3,8 +3,6 @@ package compute
 import (
 	"errors"
 	"time"
-
-	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 var ErrServerNotFound = errors.New("server not found")
@@ -26,7 +24,7 @@ func (s *Service) ListServers() []Server {
 func (s *Service) CreateServer(input CreateServer) Server {
 	now := s.clock.Now().UTC().Format(serverTimestampFormat)
 	server := Server{
-		ID:        "srv-" + idgen.RandomHex(16),
+		ID:        "srv-" + s.idGen.Hex(16),
 		Name:      input.Name,
 		ImageID:   input.ImageID,
 		FlavorID:  input.FlavorID,
