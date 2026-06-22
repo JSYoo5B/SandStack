@@ -6,6 +6,7 @@ import (
 
 	"github.com/JSYoo5B/SandStack/internal/app/image"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,4 +30,19 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 
 	s.Assert().Equal("2026-06-23T08:30:00Z", created.CreatedAt)
 	s.Assert().Equal("2026-06-23T08:30:00Z", created.UpdatedAt)
+}
+
+func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
+	service := image.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("image-id"),
+	)
+
+	created := service.Create(image.CreateImage{
+		Name:            "ubuntu",
+		ContainerFormat: "bare",
+		DiskFormat:      "qcow2",
+	})
+
+	s.Assert().Equal("img-image-id", created.ID)
 }
