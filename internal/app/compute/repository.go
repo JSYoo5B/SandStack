@@ -8,3 +8,27 @@ type ServerRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type KeyPairRepository interface {
+	Create(keyPair KeyPair) KeyPair
+	List() []KeyPair
+	Get(name string) (KeyPair, error)
+	Delete(name string) error
+	Reset()
+}
+
+type ServerGroupRepository interface {
+	Create(serverGroup ServerGroup) ServerGroup
+	List() []ServerGroup
+	Get(id string) (ServerGroup, error)
+	Delete(id string) error
+	Reset()
+}
+
+type AggregateRepository interface {
+	Create(aggregate Aggregate) Aggregate
+	List() []Aggregate
+	Get(id int) (Aggregate, error)
+	Delete(id int) error
+	Reset()
+}

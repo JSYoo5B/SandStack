@@ -34,3 +34,120 @@ type CreateServer struct {
 	FlavorID string
 	Metadata map[string]string
 }
+
+type KeyPair struct {
+	Name        string
+	Fingerprint string
+	PublicKey   string
+	PrivateKey  string
+	UserID      string
+	Type        string
+}
+
+type CreateKeyPair struct {
+	Name      string
+	UserID    string
+	Type      string
+	PublicKey string
+}
+
+type ServerAddress struct {
+	Version int
+	Address string
+}
+
+type CreateServerGroup struct {
+	Name     string
+	Policies []string
+	Policy   string
+}
+
+type ServerGroup struct {
+	ID        string
+	Name      string
+	Policies  []string
+	Members   []string
+	UserID    string
+	ProjectID string
+	Metadata  map[string]any
+	Policy    string
+}
+
+type ComputeService struct {
+	ID             string
+	Binary         string
+	DisabledReason string
+	ForcedDown     bool
+	Host           string
+	State          string
+	Status         string
+	UpdatedAt      string
+	Zone           string
+}
+
+type Hypervisor struct {
+	ID                 string
+	CurrentWorkload    int
+	Status             string
+	State              string
+	DiskAvailableLeast int
+	HostIP             string
+	FreeDiskGB         int
+	FreeRAMMB          int
+	Hostname           string
+	Type               string
+	Version            int
+	LocalGB            int
+	LocalGBUsed        int
+	MemoryMB           int
+	MemoryMBUsed       int
+	RunningVMs         int
+	ServiceID          string
+	VCPUs              int
+	VCPUsUsed          int
+}
+
+type CreateAggregate struct {
+	Name             string
+	AvailabilityZone string
+}
+
+type Aggregate struct {
+	ID               int
+	Name             string
+	AvailabilityZone string
+	Hosts            []string
+	Metadata         map[string]string
+	CreatedAt        string
+	UpdatedAt        string
+	DeletedAt        string
+	Deleted          bool
+	UUID             string
+}
+
+type Limits struct {
+	MaxTotalCores           int
+	MaxImageMeta            int
+	MaxServerMeta           int
+	MaxPersonality          int
+	MaxPersonalitySize      int
+	MaxTotalKeypairs        int
+	MaxSecurityGroups       int
+	MaxSecurityGroupRules   int
+	MaxServerGroups         int
+	MaxServerGroupMembers   int
+	MaxTotalFloatingIps     int
+	MaxTotalInstances       int
+	MaxTotalRAMSize         int
+	TotalCoresUsed          int
+	TotalInstancesUsed      int
+	TotalFloatingIpsUsed    int
+	TotalRAMUsed            int
+	TotalSecurityGroupsUsed int
+	TotalServerGroupsUsed   int
+}
+
+type AvailabilityZone struct {
+	Name      string
+	Available bool
+}

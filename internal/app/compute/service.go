@@ -6,14 +6,20 @@ import (
 )
 
 type Service struct {
-	flavors          []Flavor
-	serverRepository ServerRepository
-	clock            clock.Clock
-	idGen            idgen.Generator
+	flavors             []Flavor
+	serverRepository    ServerRepository
+	keyPairRepository   KeyPairRepository
+	groupRepository     ServerGroupRepository
+	aggregateRepository AggregateRepository
+	clock               clock.Clock
+	idGen               idgen.Generator
 }
 
 func NewServiceWithRuntime(
 	serverRepository ServerRepository,
+	keyPairRepository KeyPairRepository,
+	groupRepository ServerGroupRepository,
+	aggregateRepository AggregateRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
@@ -33,12 +39,18 @@ func NewServiceWithRuntime(
 				ExtraSpecs:  map[string]string{},
 			},
 		},
-		serverRepository: serverRepository,
-		clock:            clock,
-		idGen:            idGen,
+		serverRepository:    serverRepository,
+		keyPairRepository:   keyPairRepository,
+		groupRepository:     groupRepository,
+		aggregateRepository: aggregateRepository,
+		clock:               clock,
+		idGen:               idGen,
 	}
 }
 
 func (s *Service) Reset() {
 	s.serverRepository.Reset()
+	s.keyPairRepository.Reset()
+	s.groupRepository.Reset()
+	s.aggregateRepository.Reset()
 }

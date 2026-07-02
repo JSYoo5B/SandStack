@@ -32,6 +32,9 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appcompute.NewServiceWithRuntime(
 			storecompute.NewMemoryServerRepository(),
+			storecompute.NewMemoryKeyPairRepository(),
+			storecompute.NewMemoryServerGroupRepository(),
+			storecompute.NewMemoryAggregateRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -52,14 +55,47 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/{project_id}", h.version)
 	router.Get("/{project_id}/", h.version)
+	router.Get("/{project_id}/limits", h.getLimits)
+	router.Get("/{project_id}/os-availability-zone", h.listAvailabilityZones)
+	router.Get("/{project_id}/os-availability-zone/detail", h.listAvailabilityZones)
+	router.Get("/{project_id}/os-services", h.listComputeServices)
+	router.Get("/{project_id}/os-hypervisors/detail", h.listHypervisors)
+	router.Get("/{project_id}/os-hypervisors/statistics", h.getHypervisorStatistics)
+	router.Get("/{project_id}/os-hypervisors/{hypervisor_id}", h.getHypervisor)
+	router.Get("/{project_id}/os-aggregates", h.listAggregates)
+	router.Post("/{project_id}/os-aggregates", h.createAggregate)
+	router.Get("/{project_id}/os-aggregates/{aggregate_id}", h.getAggregate)
+	router.Delete("/{project_id}/os-aggregates/{aggregate_id}", h.deleteAggregate)
 	router.Get("/{project_id}/flavors", h.listFlavors)
 	router.Get("/{project_id}/flavors/detail", h.listFlavors)
 	router.Get("/{project_id}/flavors/{flavor_id}", h.getFlavor)
+	router.Get("/{project_id}/flavors/{flavor_id}/os-extra_specs", h.listFlavorExtraSpecs)
+	router.Post("/{project_id}/flavors/{flavor_id}/os-extra_specs", h.createFlavorExtraSpecs)
+	router.Get("/{project_id}/flavors/{flavor_id}/os-extra_specs/{key}", h.getFlavorExtraSpec)
+	router.Put("/{project_id}/flavors/{flavor_id}/os-extra_specs/{key}", h.updateFlavorExtraSpec)
+	router.Delete("/{project_id}/flavors/{flavor_id}/os-extra_specs/{key}", h.deleteFlavorExtraSpec)
 	router.Get("/{project_id}/servers", h.listServers)
 	router.Post("/{project_id}/servers", h.createServer)
 	router.Get("/{project_id}/servers/detail", h.listServers)
 	router.Get("/{project_id}/servers/{server_id}", h.getServer)
 	router.Delete("/{project_id}/servers/{server_id}", h.deleteServer)
+	router.Get("/{project_id}/servers/{server_id}/ips", h.listServerAddresses)
+	router.Get("/{project_id}/servers/{server_id}/ips/{network}", h.listServerAddressesByNetwork)
+	router.Post("/{project_id}/servers/{server_id}/action", h.actionServer)
+	router.Get("/{project_id}/servers/{server_id}/metadata", h.getServerMetadata)
+	router.Put("/{project_id}/servers/{server_id}/metadata", h.resetServerMetadata)
+	router.Post("/{project_id}/servers/{server_id}/metadata", h.updateServerMetadata)
+	router.Get("/{project_id}/servers/{server_id}/metadata/{key}", h.getServerMetadatum)
+	router.Put("/{project_id}/servers/{server_id}/metadata/{key}", h.setServerMetadatum)
+	router.Delete("/{project_id}/servers/{server_id}/metadata/{key}", h.deleteServerMetadatum)
+	router.Get("/{project_id}/os-keypairs", h.listKeyPairs)
+	router.Post("/{project_id}/os-keypairs", h.createKeyPair)
+	router.Get("/{project_id}/os-keypairs/{keypair_name}", h.getKeyPair)
+	router.Delete("/{project_id}/os-keypairs/{keypair_name}", h.deleteKeyPair)
+	router.Get("/{project_id}/os-server-groups", h.listServerGroups)
+	router.Post("/{project_id}/os-server-groups", h.createServerGroup)
+	router.Get("/{project_id}/os-server-groups/{group_id}", h.getServerGroup)
+	router.Delete("/{project_id}/os-server-groups/{group_id}", h.deleteServerGroup)
 
 	return router
 }
