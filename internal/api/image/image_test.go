@@ -63,6 +63,28 @@ func (s *ImageSuite) TestGetImage() {
 	s.Assert().Equal("ubuntu", found.Name)
 }
 
+func (s *ImageSuite) TestUpdateImage() {
+	created := s.createImage("ubuntu")
+
+	updated, err := images.Update(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL),
+		created.ID,
+		images.UpdateOpts{
+			images.ReplaceImageName{NewName: "ubuntu-updated"},
+			images.ReplaceImageMinDisk{NewMinDisk: 2},
+			images.ReplaceImageTags{NewTags: []string{"linux", "test"}},
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(updated)
+
+	s.Assert().Equal(created.ID, updated.ID)
+	s.Assert().Equal("ubuntu-updated", updated.Name)
+	s.Assert().Equal(2, updated.MinDiskGigabytes)
+	s.Assert().Equal([]string{"linux", "test"}, updated.Tags)
+}
+
 func (s *ImageSuite) TestDeleteImage() {
 	created := s.createImage("ubuntu")
 
