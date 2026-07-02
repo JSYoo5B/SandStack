@@ -16,3 +16,11 @@ type KeyPairRepository interface {
 	Delete(name string) error
 	Reset()
 }
+
+type ServerGroupRepository interface {
+	Create(serverGroup ServerGroup) ServerGroup
+	List() []ServerGroup
+	Get(id string) (ServerGroup, error)
+	Delete(id string) error
+	Reset()
+}

@@ -33,6 +33,7 @@ func NewHandler(cfg config.Config) Handler {
 		appcompute.NewServiceWithRuntime(
 			storecompute.NewMemoryServerRepository(),
 			storecompute.NewMemoryKeyPairRepository(),
+			storecompute.NewMemoryServerGroupRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -82,6 +83,10 @@ func (h Handler) Router() http.Handler {
 	router.Post("/{project_id}/os-keypairs", h.createKeyPair)
 	router.Get("/{project_id}/os-keypairs/{keypair_name}", h.getKeyPair)
 	router.Delete("/{project_id}/os-keypairs/{keypair_name}", h.deleteKeyPair)
+	router.Get("/{project_id}/os-server-groups", h.listServerGroups)
+	router.Post("/{project_id}/os-server-groups", h.createServerGroup)
+	router.Get("/{project_id}/os-server-groups/{group_id}", h.getServerGroup)
+	router.Delete("/{project_id}/os-server-groups/{group_id}", h.deleteServerGroup)
 
 	return router
 }

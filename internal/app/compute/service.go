@@ -9,6 +9,7 @@ type Service struct {
 	flavors           []Flavor
 	serverRepository  ServerRepository
 	keyPairRepository KeyPairRepository
+	groupRepository   ServerGroupRepository
 	clock             clock.Clock
 	idGen             idgen.Generator
 }
@@ -16,6 +17,7 @@ type Service struct {
 func NewServiceWithRuntime(
 	serverRepository ServerRepository,
 	keyPairRepository KeyPairRepository,
+	groupRepository ServerGroupRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
@@ -37,6 +39,7 @@ func NewServiceWithRuntime(
 		},
 		serverRepository:  serverRepository,
 		keyPairRepository: keyPairRepository,
+		groupRepository:   groupRepository,
 		clock:             clock,
 		idGen:             idGen,
 	}
@@ -45,4 +48,5 @@ func NewServiceWithRuntime(
 func (s *Service) Reset() {
 	s.serverRepository.Reset()
 	s.keyPairRepository.Reset()
+	s.groupRepository.Reset()
 }
