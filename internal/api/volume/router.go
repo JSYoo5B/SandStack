@@ -36,6 +36,7 @@ func NewHandler(cfg config.Config) Handler {
 			storevolume.NewMemoryTransferRepository(),
 			storevolume.NewMemoryBackupRepository(),
 			storevolume.NewMemoryAttachmentRepository(),
+			storevolume.NewMemoryQuotaRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -57,6 +58,13 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}", h.version)
 	router.Get("/{project_id}/", h.version)
 	router.Get("/{project_id}/limits", h.getLimits)
+	router.Get("/{project_id}/os-quota-sets/{quota_project_id}", h.getQuotaSet)
+	router.Put("/{project_id}/os-quota-sets/{quota_project_id}", h.updateQuotaSet)
+	router.Delete("/{project_id}/os-quota-sets/{quota_project_id}", h.deleteQuotaSet)
+	router.Get(
+		"/{project_id}/os-quota-sets/{quota_project_id}/defaults",
+		h.getDefaultQuotaSet,
+	)
 	router.Get("/{project_id}/volumes/detail", h.listVolumes)
 	router.Post("/{project_id}/volumes", h.createVolume)
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)

@@ -49,6 +49,45 @@ type Limits struct {
 	TotalBackupGigabytesUsed int
 }
 
+type QuotaSet struct {
+	ID                 string
+	Volumes            int
+	Snapshots          int
+	Gigabytes          int
+	PerVolumeGigabytes int
+	Backups            int
+	BackupGigabytes    int
+	Groups             int
+}
+
+type UpdateQuotaSet struct {
+	Volumes            *int
+	Snapshots          *int
+	Gigabytes          *int
+	PerVolumeGigabytes *int
+	Backups            *int
+	BackupGigabytes    *int
+	Groups             *int
+}
+
+type QuotaUsageSet struct {
+	ID                 string
+	Volumes            QuotaUsage
+	Snapshots          QuotaUsage
+	Gigabytes          QuotaUsage
+	PerVolumeGigabytes QuotaUsage
+	Backups            QuotaUsage
+	BackupGigabytes    QuotaUsage
+	Groups             QuotaUsage
+}
+
+type QuotaUsage struct {
+	InUse     int
+	Reserved  int
+	Limit     int
+	Allocated int
+}
+
 type Snapshot struct {
 	ID          string
 	Name        string

@@ -41,3 +41,10 @@ type AttachmentRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type QuotaRepository interface {
+	Get(projectID string) (QuotaSet, error)
+	Save(quotaSet QuotaSet) QuotaSet
+	Delete(projectID string) error
+	Reset()
+}
