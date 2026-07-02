@@ -8,3 +8,11 @@ type ServerRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type KeyPairRepository interface {
+	Create(keyPair KeyPair) KeyPair
+	List() []KeyPair
+	Get(name string) (KeyPair, error)
+	Delete(name string) error
+	Reset()
+}

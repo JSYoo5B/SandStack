@@ -23,6 +23,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
 	service := compute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -40,6 +41,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedClock() {
 func (s *ServerSuite) TestCreateServerUsesInjectedIDGenerator() {
 	service := compute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)
@@ -57,6 +59,7 @@ func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
 	service := compute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("server-id"),
 	)
@@ -78,6 +81,7 @@ func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 func (s *ServerSuite) TestResetClearsServers() {
 	service := compute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)
@@ -86,8 +90,10 @@ func (s *ServerSuite) TestResetClearsServers() {
 		ImageID:  "img-1",
 		FlavorID: "1",
 	})
+	service.CreateKeyPair(compute.CreateKeyPair{Name: "default"})
 
 	service.Reset()
 
 	s.Assert().Empty(service.ListServers())
+	s.Assert().Empty(service.ListKeyPairs())
 }

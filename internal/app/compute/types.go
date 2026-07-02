@@ -34,3 +34,19 @@ type CreateServer struct {
 	FlavorID string
 	Metadata map[string]string
 }
+
+type KeyPair struct {
+	Name        string
+	Fingerprint string
+	PublicKey   string
+	PrivateKey  string
+	UserID      string
+	Type        string
+}
+
+type CreateKeyPair struct {
+	Name      string
+	UserID    string
+	Type      string
+	PublicKey string
+}
