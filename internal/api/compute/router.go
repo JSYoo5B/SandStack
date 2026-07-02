@@ -57,6 +57,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/limits", h.getLimits)
 	router.Get("/{project_id}/os-availability-zone", h.listAvailabilityZones)
 	router.Get("/{project_id}/os-availability-zone/detail", h.listAvailabilityZones)
+	router.Get("/{project_id}/os-services", h.listComputeServices)
 	router.Get("/{project_id}/flavors", h.listFlavors)
 	router.Get("/{project_id}/flavors/detail", h.listFlavors)
 	router.Get("/{project_id}/flavors/{flavor_id}", h.getFlavor)
