@@ -160,6 +160,54 @@ WHERE id = ?`, id)
 	return image, nil
 }
 
+func (r *SQLiteRepository) Update(image Image) (Image, error) {
+	tagsJSON, err := json.Marshal(image.Tags)
+	if err != nil {
+		return Image{}, fmt.Errorf("marshal image tags: %w", err)
+	}
+
+	result, err := r.db.Exec(
+		`UPDATE images
+		SET name = ?,
+			status = ?,
+			container_format = ?,
+			disk_format = ?,
+			min_disk = ?,
+			min_ram = ?,
+			protected = ?,
+			visibility = ?,
+			tags_json = ?,
+			created_at = ?,
+			updated_at = ?
+		WHERE id = ?`,
+		image.Name,
+		image.Status,
+		image.ContainerFormat,
+		image.DiskFormat,
+		image.MinDisk,
+		image.MinRAM,
+		boolToInt(image.Protected),
+		image.Visibility,
+		string(tagsJSON),
+		image.CreatedAt,
+		image.UpdatedAt,
+		image.ID,
+	)
+	if err != nil {
+		return Image{}, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return Image{}, err
+	}
+	if rowsAffected == 0 {
+		return Image{}, ErrImageNotFound
+	}
+
+	return image, nil
+}
+
 func (r *SQLiteRepository) Delete(id string) error {
 	result, err := r.db.Exec(`DELETE FROM images WHERE id = ?`, id)
 	if err != nil {
