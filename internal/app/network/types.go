@@ -202,3 +202,16 @@ type CreateFloatingIP struct {
 	SubnetID          string
 	ProjectID         string
 }
+
+type RouterInterface struct {
+	ID       string
+	RouterID string
+	SubnetID string
+	PortID   string
+	TenantID string
+}
+
+type RouterInterfaceRequest struct {
+	SubnetID string
+	PortID   string
+}

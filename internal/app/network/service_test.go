@@ -112,6 +112,31 @@ func (s *ServiceSuite) TestCreateFloatingIPUsesInjectedIDGenerator() {
 	s.Assert().Equal("DOWN", created.Status)
 }
 
+func (s *ServiceSuite) TestAddAndRemoveRouterInterfaceUsesInjectedIDGenerator() {
+	service := newService(idgen.Fixed("router-interface-id"))
+	router := service.CreateRouter(network.CreateRouter{
+		Name:      "edge",
+		ProjectID: "demo",
+	})
+
+	added, err := service.AddRouterInterface(
+		router.ID,
+		network.RouterInterfaceRequest{SubnetID: "subnet-1"},
+	)
+	s.Require().NoError(err)
+
+	removed, err := service.RemoveRouterInterface(
+		router.ID,
+		network.RouterInterfaceRequest{SubnetID: "subnet-1"},
+	)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("ri-router-interface-id", added.ID)
+	s.Assert().Equal("port-router-interface-id", added.PortID)
+	s.Assert().Equal(added.ID, removed.ID)
+	s.Assert().Equal("demo", removed.TenantID)
+}
+
 func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	service := newService(idgen.Fixed("network-id"))
 	created := service.Create(network.CreateNetwork{Name: "private"})
@@ -151,6 +176,7 @@ func newService(idGen idgen.Generator) *network.Service {
 		storenetwork.NewMemorySecurityGroupRuleRepository(),
 		storenetwork.NewMemoryRouterRepository(),
 		storenetwork.NewMemoryFloatingIPRepository(),
+		storenetwork.NewMemoryRouterInterfaceRepository(),
 		idGen,
 	)
 }
