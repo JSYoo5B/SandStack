@@ -72,3 +72,28 @@ type Allocations struct {
 	ResourceProviderGeneration int
 	Allocations                map[string]Allocation
 }
+
+type AllocationCandidateQuery struct {
+	Resources map[string]int
+}
+
+type AllocationCandidates struct {
+	AllocationRequests []AllocationRequest
+	ProviderSummaries  map[string]ProviderSummary
+}
+
+type AllocationRequest struct {
+	Allocations map[string]Allocation
+}
+
+type ProviderSummary struct {
+	Resources          map[string]ProviderSummaryResource
+	Traits             []string
+	ParentProviderUUID string
+	RootProviderUUID   string
+}
+
+type ProviderSummaryResource struct {
+	Capacity int
+	Used     int
+}
