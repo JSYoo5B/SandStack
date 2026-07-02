@@ -11,6 +11,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/api/placement"
 	"github.com/JSYoo5B/SandStack/internal/api/volume"
 	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+	appidentity "github.com/JSYoo5B/SandStack/internal/app/identity"
 	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/app/requestlog"
@@ -19,6 +20,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
+	storeidentity "github.com/JSYoo5B/SandStack/internal/store/identity"
 	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
 	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
@@ -30,7 +32,18 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Use(requestID)
 	requests := requestlog.NewService()
 	router.Use(recordRequests(requests))
-	identityHandler := identity.NewHandler(cfg)
+	identityService := appidentity.NewServiceWithRepositories(
+		cfg,
+		appidentity.Repositories{
+			Users:     storeidentity.NewMemoryUserRepository(),
+			Projects:  storeidentity.NewMemoryProjectRepository(),
+			Roles:     storeidentity.NewMemoryRoleRepository(),
+			Tokens:    storeidentity.NewMemoryTokenRepository(),
+			Services:  storeidentity.NewMemoryServiceRepository(),
+			Endpoints: storeidentity.NewMemoryEndpointRepository(),
+		},
+	)
+	identityHandler := identity.NewHandlerWithService(cfg, identityService)
 	computeService := appcompute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
 		clock.Wall(),
@@ -54,6 +67,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	)
 
 	router.Mount("/_sandstack", admin.NewRouterWithState(func() {
+		identityService.Reset()
 		computeService.Reset()
 		imageService.Reset()
 		networkService.Reset()
