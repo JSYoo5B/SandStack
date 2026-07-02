@@ -24,3 +24,42 @@ type PortRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type SecurityGroupRepository interface {
+	Create(securityGroup SecurityGroup) SecurityGroup
+	List() []SecurityGroup
+	Get(id string) (SecurityGroup, error)
+	Delete(id string) error
+	Reset()
+}
+
+type SecurityGroupRuleRepository interface {
+	Create(rule SecurityGroupRule) SecurityGroupRule
+	List() []SecurityGroupRule
+	Get(id string) (SecurityGroupRule, error)
+	Delete(id string) error
+	Reset()
+}
+
+type RouterRepository interface {
+	Create(router Router) Router
+	List() []Router
+	Get(id string) (Router, error)
+	Delete(id string) error
+	Reset()
+}
+
+type FloatingIPRepository interface {
+	Create(floatingIP FloatingIP) FloatingIP
+	List() []FloatingIP
+	Get(id string) (FloatingIP, error)
+	Delete(id string) error
+	Reset()
+}
+
+type RouterInterfaceRepository interface {
+	Create(routerInterface RouterInterface) RouterInterface
+	Find(routerID string, request RouterInterfaceRequest) (RouterInterface, error)
+	Delete(id string) error
+	Reset()
+}

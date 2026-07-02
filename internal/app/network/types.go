@@ -88,3 +88,130 @@ type FixedIP struct {
 	SubnetID  string
 	IPAddress string
 }
+
+type SecurityGroup struct {
+	ID          string
+	Name        string
+	Description string
+	Stateful    bool
+	TenantID    string
+	ProjectID   string
+	Rules       []SecurityGroupRule
+	Tags        []string
+}
+
+type CreateSecurityGroup struct {
+	Name        string
+	Description string
+	Stateful    *bool
+	ProjectID   string
+}
+
+type SecurityGroupRule struct {
+	ID                   string
+	Direction            string
+	Description          string
+	EtherType            string
+	Protocol             string
+	PortRangeMin         int
+	PortRangeMax         int
+	RemoteAddressGroupID string
+	RemoteIPPrefix       string
+	RemoteGroupID        string
+	SecurityGroupID      string
+	TenantID             string
+	ProjectID            string
+}
+
+type CreateSecurityGroupRule struct {
+	Direction            string
+	Description          string
+	EtherType            string
+	Protocol             string
+	PortRangeMin         int
+	PortRangeMax         int
+	RemoteAddressGroupID string
+	RemoteIPPrefix       string
+	RemoteGroupID        string
+	SecurityGroupID      string
+	ProjectID            string
+}
+
+type Router struct {
+	ID                    string
+	Name                  string
+	Description           string
+	AdminStateUp          bool
+	Distributed           bool
+	Status                string
+	TenantID              string
+	ProjectID             string
+	GatewayInfo           RouterGatewayInfo
+	Routes                []Route
+	AvailabilityZoneHints []string
+	Tags                  []string
+}
+
+type CreateRouter struct {
+	Name                  string
+	Description           string
+	AdminStateUp          *bool
+	Distributed           *bool
+	ProjectID             string
+	GatewayInfo           RouterGatewayInfo
+	AvailabilityZoneHints []string
+}
+
+type RouterGatewayInfo struct {
+	NetworkID        string
+	EnableSNAT       *bool
+	ExternalFixedIPs []ExternalFixedIP
+	QoSPolicyID      string
+}
+
+type ExternalFixedIP struct {
+	IPAddress string
+	SubnetID  string
+}
+
+type Route struct {
+	NextHop         string
+	DestinationCIDR string
+}
+
+type FloatingIP struct {
+	ID                string
+	Description       string
+	FloatingNetworkID string
+	FloatingIP        string
+	PortID            string
+	FixedIP           string
+	TenantID          string
+	ProjectID         string
+	Status            string
+	RouterID          string
+	Tags              []string
+}
+
+type CreateFloatingIP struct {
+	Description       string
+	FloatingNetworkID string
+	FloatingIP        string
+	PortID            string
+	FixedIP           string
+	SubnetID          string
+	ProjectID         string
+}
+
+type RouterInterface struct {
+	ID       string
+	RouterID string
+	SubnetID string
+	PortID   string
+	TenantID string
+}
+
+type RouterInterfaceRequest struct {
+	SubnetID string
+	PortID   string
+}

@@ -33,6 +33,11 @@ func NewHandler(cfg config.Config) Handler {
 			storenetwork.NewMemoryNetworkRepository(),
 			storenetwork.NewMemorySubnetRepository(),
 			storenetwork.NewMemoryPortRepository(),
+			storenetwork.NewMemorySecurityGroupRepository(),
+			storenetwork.NewMemorySecurityGroupRuleRepository(),
+			storenetwork.NewMemoryRouterRepository(),
+			storenetwork.NewMemoryFloatingIPRepository(),
+			storenetwork.NewMemoryRouterInterfaceRepository(),
 			idgen.Random(),
 		),
 	)
@@ -63,6 +68,24 @@ func (h Handler) Router() http.Handler {
 	router.Post("/ports", h.createPort)
 	router.Get("/ports/{port_id}", h.getPort)
 	router.Delete("/ports/{port_id}", h.deletePort)
+	router.Get("/security-groups", h.listSecurityGroups)
+	router.Post("/security-groups", h.createSecurityGroup)
+	router.Get("/security-groups/{security_group_id}", h.getSecurityGroup)
+	router.Delete("/security-groups/{security_group_id}", h.deleteSecurityGroup)
+	router.Get("/security-group-rules", h.listSecurityGroupRules)
+	router.Post("/security-group-rules", h.createSecurityGroupRule)
+	router.Get("/security-group-rules/{security_group_rule_id}", h.getSecurityGroupRule)
+	router.Delete("/security-group-rules/{security_group_rule_id}", h.deleteSecurityGroupRule)
+	router.Get("/routers", h.listRouters)
+	router.Post("/routers", h.createRouter)
+	router.Get("/routers/{router_id}", h.getRouter)
+	router.Delete("/routers/{router_id}", h.deleteRouter)
+	router.Put("/routers/{router_id}/add_router_interface", h.addRouterInterface)
+	router.Put("/routers/{router_id}/remove_router_interface", h.removeRouterInterface)
+	router.Get("/floatingips", h.listFloatingIPs)
+	router.Post("/floatingips", h.createFloatingIP)
+	router.Get("/floatingips/{floating_ip_id}", h.getFloatingIP)
+	router.Delete("/floatingips/{floating_ip_id}", h.deleteFloatingIP)
 
 	return router
 }
