@@ -116,6 +116,7 @@ func (h Handler) Router() http.Handler {
 		"/resource_providers/{resource_provider_uuid}/allocations",
 		h.getAllocations,
 	)
+	router.Get("/allocation_candidates", h.listAllocationCandidates)
 
 	return router
 }
