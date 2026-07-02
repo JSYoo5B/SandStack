@@ -90,6 +90,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/types/{type_id}/extra_specs/{key}", h.getExtraSpec)
 	router.Put("/{project_id}/types/{type_id}/extra_specs/{key}", h.updateExtraSpec)
 	router.Delete("/{project_id}/types/{type_id}/extra_specs/{key}", h.deleteExtraSpec)
+	router.Get("/{project_id}/os-availability-zone", h.listAvailabilityZones)
 
 	return router
 }
