@@ -86,6 +86,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	placementService := appplacement.NewServiceWithRepositories(
 		storeplacement.NewMemoryResourceProviderRepository(),
 		storeplacement.NewMemoryInventoryRepository(),
+		storeplacement.NewMemoryTraitRepository(),
 		idgen.Random(),
 	)
 
