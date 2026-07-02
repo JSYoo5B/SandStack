@@ -10,8 +10,7 @@ type Service struct {
 	mu                sync.RWMutex
 	networkRepository NetworkRepository
 	subnetRepository  SubnetRepository
-	portIDs           []string
-	ports             map[string]Port
+	portRepository    PortRepository
 	idGen             idgen.Generator
 }
 
@@ -23,6 +22,7 @@ func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
 	return NewServiceWithRepositories(
 		NewMemoryNetworkRepository(),
 		NewMemorySubnetRepository(),
+		NewMemoryPortRepository(),
 		idGen,
 	)
 }
@@ -30,13 +30,13 @@ func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
 func NewServiceWithRepositories(
 	networkRepository NetworkRepository,
 	subnetRepository SubnetRepository,
+	portRepository PortRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
 		networkRepository: networkRepository,
 		subnetRepository:  subnetRepository,
-		portIDs:           []string{},
-		ports:             map[string]Port{},
+		portRepository:    portRepository,
 		idGen:             idGen,
 	}
 }
@@ -47,6 +47,5 @@ func (s *Service) Reset() {
 
 	s.networkRepository.Reset()
 	s.subnetRepository.Reset()
-	s.portIDs = []string{}
-	s.ports = map[string]Port{}
+	s.portRepository.Reset()
 }

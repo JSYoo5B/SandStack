@@ -7,15 +7,7 @@ import (
 var ErrPortNotFound = errors.New("port not found")
 
 func (s *Service) ListPorts() []Port {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	ports := make([]Port, 0, len(s.portIDs))
-	for _, id := range s.portIDs {
-		ports = append(ports, s.ports[id])
-	}
-
-	return ports
+	return s.portRepository.List()
 }
 
 func (s *Service) CreatePort(input CreatePort) Port {
@@ -40,42 +32,13 @@ func (s *Service) CreatePort(input CreatePort) Port {
 		DeviceOwner:  input.DeviceOwner,
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.portIDs = append(s.portIDs, port.ID)
-	s.ports[port.ID] = port
-
-	return port
+	return s.portRepository.Create(port)
 }
 
 func (s *Service) GetPort(id string) (Port, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	port, ok := s.ports[id]
-	if !ok {
-		return Port{}, ErrPortNotFound
-	}
-
-	return port, nil
+	return s.portRepository.Get(id)
 }
 
 func (s *Service) DeletePort(id string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, ok := s.ports[id]; !ok {
-		return ErrPortNotFound
-	}
-
-	delete(s.ports, id)
-	for index, currentID := range s.portIDs {
-		if currentID == id {
-			s.portIDs = append(s.portIDs[:index], s.portIDs[index+1:]...)
-			break
-		}
-	}
-
-	return nil
+	return s.portRepository.Delete(id)
 }
