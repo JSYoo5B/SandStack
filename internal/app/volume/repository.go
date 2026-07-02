@@ -16,3 +16,11 @@ type SnapshotRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type TransferRepository interface {
+	Create(transfer Transfer) Transfer
+	List() []Transfer
+	Get(id string) (Transfer, error)
+	Delete(id string) error
+	Reset()
+}

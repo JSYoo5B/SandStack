@@ -53,3 +53,17 @@ type CreateSnapshot struct {
 	Force       bool
 	Metadata    map[string]string
 }
+
+type Transfer struct {
+	ID        string
+	AuthKey   string
+	Name      string
+	VolumeID  string
+	CreatedAt string
+	Links     []map[string]string
+}
+
+type CreateTransfer struct {
+	Name     string
+	VolumeID string
+}
