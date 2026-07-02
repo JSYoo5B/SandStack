@@ -13,3 +13,28 @@ type CreateResourceProvider struct {
 	Name               string
 	ParentProviderUUID string
 }
+
+type Inventory struct {
+	ResourceClass   string
+	AllocationRatio float32
+	MaxUnit         int
+	MinUnit         int
+	Reserved        int
+	StepSize        int
+	Total           int
+}
+
+type Inventories struct {
+	ResourceProviderGeneration int
+	Inventories                map[string]Inventory
+}
+
+type UpdateInventories struct {
+	ResourceProviderGeneration int
+	Inventories                map[string]Inventory
+}
+
+type UpdateInventory struct {
+	ResourceProviderGeneration int
+	Inventory                  Inventory
+}
