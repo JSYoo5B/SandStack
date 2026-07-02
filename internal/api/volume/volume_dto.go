@@ -12,12 +12,28 @@ type createVolumeRequest struct {
 	} `json:"volume"`
 }
 
+type updateVolumeRequest struct {
+	Volume struct {
+		Name        *string           `json:"name"`
+		Description *string           `json:"description"`
+		Metadata    map[string]string `json:"metadata"`
+	} `json:"volume"`
+}
+
 func (r createVolumeRequest) createVolume() appvolume.CreateVolume {
 	return appvolume.CreateVolume{
 		Size:        r.Volume.Size,
 		Name:        r.Volume.Name,
 		Description: r.Volume.Description,
 		VolumeType:  r.Volume.VolumeType,
+		Metadata:    r.Volume.Metadata,
+	}
+}
+
+func (r updateVolumeRequest) updateVolume() appvolume.UpdateVolume {
+	return appvolume.UpdateVolume{
+		Name:        r.Volume.Name,
+		Description: r.Volume.Description,
 		Metadata:    r.Volume.Metadata,
 	}
 }
