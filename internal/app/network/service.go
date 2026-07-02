@@ -13,6 +13,7 @@ type Service struct {
 	portRepository          PortRepository
 	securityGroupRepository SecurityGroupRepository
 	securityRuleRepository  SecurityGroupRuleRepository
+	routerRepository        RouterRepository
 	idGen                   idgen.Generator
 }
 
@@ -22,6 +23,7 @@ func NewServiceWithRepositories(
 	portRepository PortRepository,
 	securityGroupRepository SecurityGroupRepository,
 	securityRuleRepository SecurityGroupRuleRepository,
+	routerRepository RouterRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
@@ -30,6 +32,7 @@ func NewServiceWithRepositories(
 		portRepository:          portRepository,
 		securityGroupRepository: securityGroupRepository,
 		securityRuleRepository:  securityRuleRepository,
+		routerRepository:        routerRepository,
 		idGen:                   idGen,
 	}
 }
@@ -43,4 +46,5 @@ func (s *Service) Reset() {
 	s.portRepository.Reset()
 	s.securityGroupRepository.Reset()
 	s.securityRuleRepository.Reset()
+	s.routerRepository.Reset()
 }
