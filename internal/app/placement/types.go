@@ -38,3 +38,13 @@ type UpdateInventory struct {
 	ResourceProviderGeneration int
 	Inventory                  Inventory
 }
+
+type Traits struct {
+	ResourceProviderGeneration int
+	Traits                     []string
+}
+
+type UpdateTraits struct {
+	ResourceProviderGeneration int
+	Traits                     []string
+}

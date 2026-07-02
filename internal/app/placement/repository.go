@@ -17,3 +17,10 @@ type InventoryRepository interface {
 	Delete(resourceProviderUUID string, resourceClass string) error
 	Reset()
 }
+
+type TraitRepository interface {
+	Set(resourceProviderUUID string, traits []string)
+	Get(resourceProviderUUID string) []string
+	Delete(resourceProviderUUID string)
+	Reset()
+}

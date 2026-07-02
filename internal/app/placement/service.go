@@ -14,17 +14,20 @@ var (
 type Service struct {
 	resourceProviderRepository ResourceProviderRepository
 	inventoryRepository        InventoryRepository
+	traitRepository            TraitRepository
 	idGen                      idgen.Generator
 }
 
 func NewServiceWithRepositories(
 	resourceProviderRepository ResourceProviderRepository,
 	inventoryRepository InventoryRepository,
+	traitRepository TraitRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
 		resourceProviderRepository: resourceProviderRepository,
 		inventoryRepository:        inventoryRepository,
+		traitRepository:            traitRepository,
 		idGen:                      idGen,
 	}
 }
@@ -68,6 +71,7 @@ func (s *Service) DeleteResourceProvider(uuid string) error {
 	}
 
 	s.inventoryRepository.DeleteAll(uuid)
+	s.traitRepository.Delete(uuid)
 	return nil
 }
 
@@ -167,7 +171,47 @@ func (s *Service) DeleteInventory(
 	return s.inventoryRepository.Delete(resourceProviderUUID, resourceClass)
 }
 
+func (s *Service) GetTraits(resourceProviderUUID string) (Traits, error) {
+	provider, err := s.resourceProviderRepository.Get(resourceProviderUUID)
+	if err != nil {
+		return Traits{}, err
+	}
+
+	return Traits{
+		ResourceProviderGeneration: provider.Generation,
+		Traits:                     s.traitRepository.Get(resourceProviderUUID),
+	}, nil
+}
+
+func (s *Service) UpdateTraits(
+	resourceProviderUUID string,
+	input UpdateTraits,
+) (Traits, error) {
+	provider, err := s.resourceProviderRepository.Get(resourceProviderUUID)
+	if err != nil {
+		return Traits{}, err
+	}
+
+	s.traitRepository.Set(resourceProviderUUID, input.Traits)
+
+	return Traits{
+		ResourceProviderGeneration: provider.Generation,
+		Traits:                     s.traitRepository.Get(resourceProviderUUID),
+	}, nil
+}
+
+func (s *Service) DeleteTraits(resourceProviderUUID string) error {
+	_, err := s.resourceProviderRepository.Get(resourceProviderUUID)
+	if err != nil {
+		return err
+	}
+
+	s.traitRepository.Delete(resourceProviderUUID)
+	return nil
+}
+
 func (s *Service) Reset() {
 	s.resourceProviderRepository.Reset()
 	s.inventoryRepository.Reset()
+	s.traitRepository.Reset()
 }
