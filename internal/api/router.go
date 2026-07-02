@@ -55,6 +55,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	imageService := appimage.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)

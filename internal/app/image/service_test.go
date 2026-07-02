@@ -24,6 +24,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -42,6 +43,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -59,6 +61,7 @@ func (s *ServiceSuite) TestResetClearsImages() {
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -69,10 +72,15 @@ func (s *ServiceSuite) TestResetClearsImages() {
 	})
 	err := service.UploadData(created.ID, []byte("image-data"))
 	s.Require().NoError(err)
+	_, err = service.CreateMember(created.ID, "project-1")
+	s.Require().NoError(err)
 
 	service.Reset()
 
 	s.Assert().Empty(service.List())
 	_, err = service.DownloadData(created.ID)
 	s.ErrorIs(err, image.ErrImageNotFound)
+	members, err := service.ListMembers(created.ID)
+	s.ErrorIs(err, image.ErrImageNotFound)
+	s.Nil(members)
 }

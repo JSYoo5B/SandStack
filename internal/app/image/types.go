@@ -24,3 +24,11 @@ type Image struct {
 	CreatedAt       string
 	UpdatedAt       string
 }
+
+type Member struct {
+	ImageID   string
+	MemberID  string
+	Status    string
+	CreatedAt string
+	UpdatedAt string
+}
