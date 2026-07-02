@@ -25,6 +25,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
 		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -44,6 +45,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
 		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -62,6 +64,7 @@ func (s *ServiceSuite) TestResetClearsImages() {
 		storeimage.NewMemoryRepository(),
 		storeimage.NewMemoryDataRepository(),
 		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -74,6 +77,7 @@ func (s *ServiceSuite) TestResetClearsImages() {
 	s.Require().NoError(err)
 	_, err = service.CreateMember(created.ID, "project-1")
 	s.Require().NoError(err)
+	task := service.CreateTask(image.CreateTask{Type: "import"})
 
 	service.Reset()
 
@@ -83,4 +87,6 @@ func (s *ServiceSuite) TestResetClearsImages() {
 	members, err := service.ListMembers(created.ID)
 	s.ErrorIs(err, image.ErrImageNotFound)
 	s.Nil(members)
+	_, err = service.GetTask(task.ID)
+	s.ErrorIs(err, image.ErrTaskNotFound)
 }
