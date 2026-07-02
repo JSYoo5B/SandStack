@@ -63,6 +63,9 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/servers/{server_id}/metadata", h.getServerMetadata)
 	router.Put("/{project_id}/servers/{server_id}/metadata", h.resetServerMetadata)
 	router.Post("/{project_id}/servers/{server_id}/metadata", h.updateServerMetadata)
+	router.Get("/{project_id}/servers/{server_id}/metadata/{key}", h.getServerMetadatum)
+	router.Put("/{project_id}/servers/{server_id}/metadata/{key}", h.setServerMetadatum)
+	router.Delete("/{project_id}/servers/{server_id}/metadata/{key}", h.deleteServerMetadatum)
 
 	return router
 }
