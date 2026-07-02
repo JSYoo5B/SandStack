@@ -48,17 +48,19 @@ type securityGroupDocument struct {
 }
 
 type securityGroupRuleDocument struct {
-	ID              string `json:"id"`
-	Direction       string `json:"direction"`
-	EtherType       string `json:"ethertype"`
-	Protocol        string `json:"protocol"`
-	PortRangeMin    int    `json:"port_range_min"`
-	PortRangeMax    int    `json:"port_range_max"`
-	RemoteIPPrefix  string `json:"remote_ip_prefix"`
-	RemoteGroupID   string `json:"remote_group_id"`
-	SecurityGroupID string `json:"security_group_id"`
-	TenantID        string `json:"tenant_id"`
-	ProjectID       string `json:"project_id"`
+	ID                   string `json:"id"`
+	Direction            string `json:"direction"`
+	Description          string `json:"description"`
+	EtherType            string `json:"ethertype"`
+	Protocol             string `json:"protocol"`
+	PortRangeMin         int    `json:"port_range_min"`
+	PortRangeMax         int    `json:"port_range_max"`
+	RemoteAddressGroupID string `json:"remote_address_group_id"`
+	RemoteIPPrefix       string `json:"remote_ip_prefix"`
+	RemoteGroupID        string `json:"remote_group_id"`
+	SecurityGroupID      string `json:"security_group_id"`
+	TenantID             string `json:"tenant_id"`
+	ProjectID            string `json:"project_id"`
 }
 
 func toSecurityGroupDocuments(
@@ -93,17 +95,19 @@ func toSecurityGroupRuleDocuments(
 	documents := make([]securityGroupRuleDocument, 0, len(rules))
 	for _, rule := range rules {
 		documents = append(documents, securityGroupRuleDocument{
-			ID:              rule.ID,
-			Direction:       rule.Direction,
-			EtherType:       rule.EtherType,
-			Protocol:        rule.Protocol,
-			PortRangeMin:    rule.PortRangeMin,
-			PortRangeMax:    rule.PortRangeMax,
-			RemoteIPPrefix:  rule.RemoteIPPrefix,
-			RemoteGroupID:   rule.RemoteGroupID,
-			SecurityGroupID: rule.SecurityGroupID,
-			TenantID:        rule.TenantID,
-			ProjectID:       rule.ProjectID,
+			ID:                   rule.ID,
+			Direction:            rule.Direction,
+			Description:          rule.Description,
+			EtherType:            rule.EtherType,
+			Protocol:             rule.Protocol,
+			PortRangeMin:         rule.PortRangeMin,
+			PortRangeMax:         rule.PortRangeMax,
+			RemoteAddressGroupID: rule.RemoteAddressGroupID,
+			RemoteIPPrefix:       rule.RemoteIPPrefix,
+			RemoteGroupID:        rule.RemoteGroupID,
+			SecurityGroupID:      rule.SecurityGroupID,
+			TenantID:             rule.TenantID,
+			ProjectID:            rule.ProjectID,
 		})
 	}
 

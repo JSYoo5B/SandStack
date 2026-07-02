@@ -32,3 +32,11 @@ type SecurityGroupRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type SecurityGroupRuleRepository interface {
+	Create(rule SecurityGroupRule) SecurityGroupRule
+	List() []SecurityGroupRule
+	Get(id string) (SecurityGroupRule, error)
+	Delete(id string) error
+	Reset()
+}
