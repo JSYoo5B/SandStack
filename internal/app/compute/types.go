@@ -55,3 +55,25 @@ type ServerAddress struct {
 	Version int
 	Address string
 }
+
+type Limits struct {
+	MaxTotalCores           int
+	MaxImageMeta            int
+	MaxServerMeta           int
+	MaxPersonality          int
+	MaxPersonalitySize      int
+	MaxTotalKeypairs        int
+	MaxSecurityGroups       int
+	MaxSecurityGroupRules   int
+	MaxServerGroups         int
+	MaxServerGroupMembers   int
+	MaxTotalFloatingIps     int
+	MaxTotalInstances       int
+	MaxTotalRAMSize         int
+	TotalCoresUsed          int
+	TotalInstancesUsed      int
+	TotalFloatingIpsUsed    int
+	TotalRAMUsed            int
+	TotalSecurityGroupsUsed int
+	TotalServerGroupsUsed   int
+}
