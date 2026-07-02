@@ -14,6 +14,7 @@ import (
 	appidentity "github.com/JSYoo5B/SandStack/internal/app/identity"
 	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
+	appplacement "github.com/JSYoo5B/SandStack/internal/app/placement"
 	"github.com/JSYoo5B/SandStack/internal/app/requestlog"
 	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
@@ -23,6 +24,7 @@ import (
 	storeidentity "github.com/JSYoo5B/SandStack/internal/store/identity"
 	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
+	storeplacement "github.com/JSYoo5B/SandStack/internal/store/placement"
 	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/go-chi/chi/v5"
 )
@@ -81,12 +83,17 @@ func NewRouter(cfg config.Config) http.Handler {
 		clock.Wall(),
 		idgen.Random(),
 	)
+	placementService := appplacement.NewServiceWithRepositories(
+		storeplacement.NewMemoryResourceProviderRepository(),
+		idgen.Random(),
+	)
 
 	router.Mount("/_sandstack", admin.NewRouterWithState(func() {
 		identityService.Reset()
 		computeService.Reset()
 		imageService.Reset()
 		networkService.Reset()
+		placementService.Reset()
 		volumeService.Reset()
 		requests.Reset()
 	}, requests))
@@ -98,7 +105,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Mount("/compute/v2.1", compute.NewRouterWithService(cfg, computeService))
 	router.Mount("/image/v2", image.NewRouterWithService(cfg, imageService))
 	router.Mount("/network/v2.0", network.NewRouterWithService(cfg, networkService))
-	router.Mount("/placement", placement.NewRouter(cfg))
+	router.Mount("/placement", placement.NewRouterWithService(cfg, placementService))
 	router.Mount("/volume/v3", volume.NewRouterWithService(cfg, volumeService))
 
 	return router
