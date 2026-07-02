@@ -32,3 +32,12 @@ type BackupRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type AttachmentRepository interface {
+	Create(attachment Attachment) Attachment
+	List() []Attachment
+	Get(id string) (Attachment, error)
+	Update(attachment Attachment) (Attachment, error)
+	Delete(id string) error
+	Reset()
+}

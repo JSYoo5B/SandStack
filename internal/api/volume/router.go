@@ -35,6 +35,7 @@ func NewHandler(cfg config.Config) Handler {
 			storevolume.NewMemorySnapshotRepository(),
 			storevolume.NewMemoryTransferRepository(),
 			storevolume.NewMemoryBackupRepository(),
+			storevolume.NewMemoryAttachmentRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -75,6 +76,12 @@ func (h Handler) Router() http.Handler {
 	router.Post("/{project_id}/backups", h.createBackup)
 	router.Get("/{project_id}/backups/{backup_id}", h.getBackup)
 	router.Delete("/{project_id}/backups/{backup_id}", h.deleteBackup)
+	router.Get("/{project_id}/attachments/detail", h.listAttachments)
+	router.Post("/{project_id}/attachments", h.createAttachment)
+	router.Get("/{project_id}/attachments/{attachment_id}", h.getAttachment)
+	router.Put("/{project_id}/attachments/{attachment_id}", h.updateAttachment)
+	router.Delete("/{project_id}/attachments/{attachment_id}", h.deleteAttachment)
+	router.Post("/{project_id}/attachments/{attachment_id}/action", h.actionAttachment)
 	router.Get("/{project_id}/types", h.listVolumeTypes)
 	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)
 
