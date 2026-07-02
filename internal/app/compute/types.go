@@ -85,6 +85,28 @@ type ComputeService struct {
 	Zone           string
 }
 
+type Hypervisor struct {
+	ID                 string
+	CurrentWorkload    int
+	Status             string
+	State              string
+	DiskAvailableLeast int
+	HostIP             string
+	FreeDiskGB         int
+	FreeRAMMB          int
+	Hostname           string
+	Type               string
+	Version            int
+	LocalGB            int
+	LocalGBUsed        int
+	MemoryMB           int
+	MemoryMBUsed       int
+	RunningVMs         int
+	ServiceID          string
+	VCPUs              int
+	VCPUsUsed          int
+}
+
 type Limits struct {
 	MaxTotalCores           int
 	MaxImageMeta            int
