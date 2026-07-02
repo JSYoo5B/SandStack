@@ -31,6 +31,11 @@ type VolumeType struct {
 	IsPublic    bool
 }
 
+type AvailabilityZone struct {
+	Name      string
+	Available bool
+}
+
 type Snapshot struct {
 	ID          string
 	Name        string
