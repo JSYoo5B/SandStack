@@ -1,6 +1,7 @@
 package image_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/JSYoo5B/SandStack/internal/app/image"
@@ -89,4 +90,32 @@ func (s *SQLiteRepositorySuite) TestResetClearsImages() {
 	s.repository.Reset()
 
 	s.Assert().Empty(s.repository.List())
+}
+
+func (s *SQLiteRepositorySuite) TestFileBackedDatabasePersistsImages() {
+	path := filepath.Join(s.T().TempDir(), "sandstack.db")
+	repository, err := image.OpenSQLiteRepository(path)
+	s.Require().NoError(err)
+
+	created := repository.Create(image.Image{
+		ID:              "img-1",
+		Name:            "ubuntu",
+		Status:          "queued",
+		ContainerFormat: "bare",
+		DiskFormat:      "qcow2",
+		Visibility:      "private",
+		Tags:            []string{},
+		CreatedAt:       "2026-07-03T00:00:00Z",
+		UpdatedAt:       "2026-07-03T00:00:00Z",
+	})
+	s.Require().NoError(repository.Close())
+
+	reopened, err := image.OpenSQLiteRepository(path)
+	s.Require().NoError(err)
+	defer reopened.Close()
+
+	found, err := reopened.Get(created.ID)
+	s.Require().NoError(err)
+
+	s.Assert().Equal(created, found)
 }
