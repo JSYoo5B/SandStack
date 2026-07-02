@@ -15,3 +15,12 @@ type DataRepository interface {
 	Delete(id string)
 	Reset()
 }
+
+type MemberRepository interface {
+	Create(member Member) Member
+	List(imageID string) []Member
+	Get(imageID string, memberID string) (Member, error)
+	Update(member Member) (Member, error)
+	Delete(imageID string, memberID string) error
+	Reset()
+}
