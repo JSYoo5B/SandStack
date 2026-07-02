@@ -36,6 +36,7 @@ func NewHandler(cfg config.Config) Handler {
 			storeplacement.NewMemoryAggregateRepository(),
 			storeplacement.NewMemoryUsageRepository(),
 			storeplacement.NewMemoryAllocationRepository(),
+			storeplacement.NewMemoryResourceClassRepository(),
 			idgen.Random(),
 		),
 	)
@@ -117,6 +118,11 @@ func (h Handler) Router() http.Handler {
 		h.getAllocations,
 	)
 	router.Get("/allocation_candidates", h.listAllocationCandidates)
+	router.Get("/resource_classes", h.listResourceClasses)
+	router.Post("/resource_classes", h.createResourceClass)
+	router.Get("/resource_classes/{resource_class}", h.getResourceClass)
+	router.Put("/resource_classes/{resource_class}", h.updateResourceClass)
+	router.Delete("/resource_classes/{resource_class}", h.deleteResourceClass)
 
 	return router
 }

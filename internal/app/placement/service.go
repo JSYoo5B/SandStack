@@ -9,6 +9,7 @@ import (
 var (
 	ErrResourceProviderNotFound = errors.New("resource provider not found")
 	ErrInventoryNotFound        = errors.New("inventory not found")
+	ErrResourceClassNotFound    = errors.New("resource class not found")
 )
 
 type Service struct {
@@ -18,6 +19,7 @@ type Service struct {
 	aggregateRepository        AggregateRepository
 	usageRepository            UsageRepository
 	allocationRepository       AllocationRepository
+	resourceClassRepository    ResourceClassRepository
 	idGen                      idgen.Generator
 }
 
@@ -28,6 +30,7 @@ func NewServiceWithRepositories(
 	aggregateRepository AggregateRepository,
 	usageRepository UsageRepository,
 	allocationRepository AllocationRepository,
+	resourceClassRepository ResourceClassRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
@@ -37,6 +40,7 @@ func NewServiceWithRepositories(
 		aggregateRepository:        aggregateRepository,
 		usageRepository:            usageRepository,
 		allocationRepository:       allocationRepository,
+		resourceClassRepository:    resourceClassRepository,
 		idGen:                      idGen,
 	}
 }
@@ -48,4 +52,5 @@ func (s *Service) Reset() {
 	s.aggregateRepository.Reset()
 	s.usageRepository.Reset()
 	s.allocationRepository.Reset()
+	s.resourceClassRepository.Reset()
 }

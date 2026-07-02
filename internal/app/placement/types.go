@@ -97,3 +97,7 @@ type ProviderSummaryResource struct {
 	Capacity int
 	Used     int
 }
+
+type ResourceClass struct {
+	Name string
+}
