@@ -1,21 +1,25 @@
 package network
 
-import "sync"
+import (
+	"sync"
+
+	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
+)
 
 type MemoryNetworkRepository struct {
 	mu       sync.RWMutex
 	ids      []string
-	networks map[string]Network
+	networks map[string]appnetwork.Network
 }
 
 func NewMemoryNetworkRepository() *MemoryNetworkRepository {
 	return &MemoryNetworkRepository{
 		ids:      []string{},
-		networks: map[string]Network{},
+		networks: map[string]appnetwork.Network{},
 	}
 }
 
-func (r *MemoryNetworkRepository) Create(network Network) Network {
+func (r *MemoryNetworkRepository) Create(network appnetwork.Network) appnetwork.Network {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -25,11 +29,11 @@ func (r *MemoryNetworkRepository) Create(network Network) Network {
 	return network
 }
 
-func (r *MemoryNetworkRepository) List() []Network {
+func (r *MemoryNetworkRepository) List() []appnetwork.Network {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	networks := make([]Network, 0, len(r.ids))
+	networks := make([]appnetwork.Network, 0, len(r.ids))
 	for _, id := range r.ids {
 		networks = append(networks, r.networks[id])
 	}
@@ -37,24 +41,24 @@ func (r *MemoryNetworkRepository) List() []Network {
 	return networks
 }
 
-func (r *MemoryNetworkRepository) Get(id string) (Network, error) {
+func (r *MemoryNetworkRepository) Get(id string) (appnetwork.Network, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	network, ok := r.networks[id]
 	if !ok {
-		return Network{}, ErrNetworkNotFound
+		return appnetwork.Network{}, appnetwork.ErrNetworkNotFound
 	}
 
 	return network, nil
 }
 
-func (r *MemoryNetworkRepository) Update(network Network) (Network, error) {
+func (r *MemoryNetworkRepository) Update(network appnetwork.Network) (appnetwork.Network, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if _, ok := r.networks[network.ID]; !ok {
-		return Network{}, ErrNetworkNotFound
+		return appnetwork.Network{}, appnetwork.ErrNetworkNotFound
 	}
 
 	r.networks[network.ID] = network
@@ -67,7 +71,7 @@ func (r *MemoryNetworkRepository) Delete(id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.networks[id]; !ok {
-		return ErrNetworkNotFound
+		return appnetwork.ErrNetworkNotFound
 	}
 
 	delete(r.networks, id)
@@ -86,5 +90,5 @@ func (r *MemoryNetworkRepository) Reset() {
 	defer r.mu.Unlock()
 
 	r.ids = []string{}
-	r.networks = map[string]Network{}
+	r.networks = map[string]appnetwork.Network{}
 }

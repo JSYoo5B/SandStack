@@ -20,6 +20,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
+	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
 	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/go-chi/chi/v5"
 )
@@ -40,7 +41,12 @@ func NewRouter(cfg config.Config) http.Handler {
 		clock.Wall(),
 		idgen.Random(),
 	)
-	networkService := appnetwork.NewService()
+	networkService := appnetwork.NewServiceWithRepositories(
+		storenetwork.NewMemoryNetworkRepository(),
+		storenetwork.NewMemorySubnetRepository(),
+		storenetwork.NewMemoryPortRepository(),
+		idgen.Random(),
+	)
 	volumeService := appvolume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
 		clock.Wall(),
