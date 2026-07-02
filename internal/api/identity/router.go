@@ -41,6 +41,8 @@ func (h Handler) Router() http.Handler {
 	router.Get("/roles/{role_id}", h.getRole)
 	router.Get("/services", h.listServices)
 	router.Get("/services/{service_id}", h.getService)
+	router.Get("/endpoints", h.listEndpoints)
+	router.Get("/endpoints/{endpoint_id}", h.getEndpoint)
 
 	return router
 }
