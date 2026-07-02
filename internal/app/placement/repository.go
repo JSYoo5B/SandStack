@@ -45,3 +45,11 @@ type AllocationRepository interface {
 	Delete(resourceProviderUUID string)
 	Reset()
 }
+
+type ResourceClassRepository interface {
+	Create(resourceClass ResourceClass) ResourceClass
+	List() []ResourceClass
+	Get(name string) (ResourceClass, error)
+	Delete(name string) error
+	Reset()
+}
