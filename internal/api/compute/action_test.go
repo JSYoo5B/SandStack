@@ -27,6 +27,7 @@ func TestActionSuite(t *testing.T) {
 func (s *ActionSuite) SetupTest() {
 	s.service = appcompute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)

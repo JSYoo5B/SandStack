@@ -46,6 +46,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	identityHandler := identity.NewHandlerWithService(cfg, identityService)
 	computeService := appcompute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
+		storecompute.NewMemoryKeyPairRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)
