@@ -88,3 +88,35 @@ type FixedIP struct {
 	SubnetID  string
 	IPAddress string
 }
+
+type SecurityGroup struct {
+	ID          string
+	Name        string
+	Description string
+	Stateful    bool
+	TenantID    string
+	ProjectID   string
+	Rules       []SecurityGroupRule
+	Tags        []string
+}
+
+type CreateSecurityGroup struct {
+	Name        string
+	Description string
+	Stateful    *bool
+	ProjectID   string
+}
+
+type SecurityGroupRule struct {
+	ID              string
+	Direction       string
+	EtherType       string
+	Protocol        string
+	PortRangeMin    int
+	PortRangeMax    int
+	RemoteIPPrefix  string
+	RemoteGroupID   string
+	SecurityGroupID string
+	TenantID        string
+	ProjectID       string
+}
