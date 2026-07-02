@@ -24,3 +24,11 @@ type TransferRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type BackupRepository interface {
+	Create(backup Backup) Backup
+	List() []Backup
+	Get(id string) (Backup, error)
+	Delete(id string) error
+	Reset()
+}
