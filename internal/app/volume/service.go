@@ -1,16 +1,12 @@
 package volume
 
 import (
-	"sync"
-
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 type Service struct {
-	mu          sync.RWMutex
-	ids         []string
-	volumes     map[string]Volume
+	repository  Repository
 	volumeTypes []VolumeType
 	clock       clock.Clock
 	idGen       idgen.Generator
@@ -28,9 +24,16 @@ func NewServiceWithRuntime(
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
+	return NewServiceWithRepository(NewMemoryRepository(), clock, idGen)
+}
+
+func NewServiceWithRepository(
+	repository Repository,
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
 	return &Service{
-		ids:     []string{},
-		volumes: map[string]Volume{},
+		repository: repository,
 		volumeTypes: []VolumeType{
 			{
 				ID:          "default",
@@ -46,9 +49,5 @@ func NewServiceWithRuntime(
 }
 
 func (s *Service) Reset() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ids = []string{}
-	s.volumes = map[string]Volume{}
+	s.repository.Reset()
 }
