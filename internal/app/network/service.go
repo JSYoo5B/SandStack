@@ -14,6 +14,7 @@ type Service struct {
 	securityGroupRepository SecurityGroupRepository
 	securityRuleRepository  SecurityGroupRuleRepository
 	routerRepository        RouterRepository
+	floatingIPRepository    FloatingIPRepository
 	idGen                   idgen.Generator
 }
 
@@ -24,6 +25,7 @@ func NewServiceWithRepositories(
 	securityGroupRepository SecurityGroupRepository,
 	securityRuleRepository SecurityGroupRuleRepository,
 	routerRepository RouterRepository,
+	floatingIPRepository FloatingIPRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
@@ -33,6 +35,7 @@ func NewServiceWithRepositories(
 		securityGroupRepository: securityGroupRepository,
 		securityRuleRepository:  securityRuleRepository,
 		routerRepository:        routerRepository,
+		floatingIPRepository:    floatingIPRepository,
 		idGen:                   idGen,
 	}
 }
@@ -47,4 +50,5 @@ func (s *Service) Reset() {
 	s.securityGroupRepository.Reset()
 	s.securityRuleRepository.Reset()
 	s.routerRepository.Reset()
+	s.floatingIPRepository.Reset()
 }
