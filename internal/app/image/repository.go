@@ -24,3 +24,10 @@ type MemberRepository interface {
 	Delete(imageID string, memberID string) error
 	Reset()
 }
+
+type TaskRepository interface {
+	Create(task Task) Task
+	List() []Task
+	Get(id string) (Task, error)
+	Reset()
+}

@@ -32,3 +32,21 @@ type Member struct {
 	CreatedAt string
 	UpdatedAt string
 }
+
+type Task struct {
+	ID        string
+	Type      string
+	Status    string
+	Input     map[string]any
+	Result    map[string]any
+	Owner     string
+	Message   string
+	ExpiresAt string
+	CreatedAt string
+	UpdatedAt string
+}
+
+type CreateTask struct {
+	Type  string
+	Input map[string]any
+}
