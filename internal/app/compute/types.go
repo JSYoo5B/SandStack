@@ -56,6 +56,23 @@ type ServerAddress struct {
 	Address string
 }
 
+type CreateServerGroup struct {
+	Name     string
+	Policies []string
+	Policy   string
+}
+
+type ServerGroup struct {
+	ID        string
+	Name      string
+	Policies  []string
+	Members   []string
+	UserID    string
+	ProjectID string
+	Metadata  map[string]any
+	Policy    string
+}
+
 type Limits struct {
 	MaxTotalCores           int
 	MaxImageMeta            int

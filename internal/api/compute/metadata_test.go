@@ -28,6 +28,7 @@ func (s *MetadataSuite) SetupTest() {
 	s.service = appcompute.NewServiceWithRuntime(
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
+		storecompute.NewMemoryServerGroupRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)
