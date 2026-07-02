@@ -35,6 +35,8 @@ func (h Handler) Router() http.Handler {
 	router.Post("/auth/tokens", h.createToken)
 	router.Get("/projects", h.listProjects)
 	router.Get("/projects/{project_id}", h.getProject)
+	router.Get("/users", h.listUsers)
+	router.Get("/users/{user_id}", h.getUser)
 
 	return router
 }
