@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
 	_ "modernc.org/sqlite"
 )
 
@@ -53,7 +54,7 @@ func (r *SQLiteRepository) Close() error {
 	return r.db.Close()
 }
 
-func (r *SQLiteRepository) Create(image Image) Image {
+func (r *SQLiteRepository) Create(image appimage.Image) appimage.Image {
 	tagsJSON, err := json.Marshal(image.Tags)
 	if err != nil {
 		panic(fmt.Errorf("marshal image tags: %w", err))
@@ -94,7 +95,7 @@ func (r *SQLiteRepository) Create(image Image) Image {
 	return image
 }
 
-func (r *SQLiteRepository) List() []Image {
+func (r *SQLiteRepository) List() []appimage.Image {
 	rows, err := r.db.Query(`
 SELECT
 	id,
@@ -116,7 +117,7 @@ ORDER BY sequence`)
 	}
 	defer rows.Close()
 
-	images := []Image{}
+	images := []appimage.Image{}
 	for rows.Next() {
 		image, err := scanImage(rows)
 		if err != nil {
@@ -131,7 +132,7 @@ ORDER BY sequence`)
 	return images
 }
 
-func (r *SQLiteRepository) Get(id string) (Image, error) {
+func (r *SQLiteRepository) Get(id string) (appimage.Image, error) {
 	row := r.db.QueryRow(`
 SELECT
 	id,
@@ -151,10 +152,58 @@ WHERE id = ?`, id)
 
 	image, err := scanImage(row)
 	if errors.Is(err, sql.ErrNoRows) {
-		return Image{}, ErrImageNotFound
+		return appimage.Image{}, appimage.ErrImageNotFound
 	}
 	if err != nil {
-		return Image{}, err
+		return appimage.Image{}, err
+	}
+
+	return image, nil
+}
+
+func (r *SQLiteRepository) Update(image appimage.Image) (appimage.Image, error) {
+	tagsJSON, err := json.Marshal(image.Tags)
+	if err != nil {
+		return appimage.Image{}, fmt.Errorf("marshal image tags: %w", err)
+	}
+
+	result, err := r.db.Exec(
+		`UPDATE images
+		SET name = ?,
+			status = ?,
+			container_format = ?,
+			disk_format = ?,
+			min_disk = ?,
+			min_ram = ?,
+			protected = ?,
+			visibility = ?,
+			tags_json = ?,
+			created_at = ?,
+			updated_at = ?
+		WHERE id = ?`,
+		image.Name,
+		image.Status,
+		image.ContainerFormat,
+		image.DiskFormat,
+		image.MinDisk,
+		image.MinRAM,
+		boolToInt(image.Protected),
+		image.Visibility,
+		string(tagsJSON),
+		image.CreatedAt,
+		image.UpdatedAt,
+		image.ID,
+	)
+	if err != nil {
+		return appimage.Image{}, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return appimage.Image{}, err
+	}
+	if rowsAffected == 0 {
+		return appimage.Image{}, appimage.ErrImageNotFound
 	}
 
 	return image, nil
@@ -171,7 +220,7 @@ func (r *SQLiteRepository) Delete(id string) error {
 		return err
 	}
 	if rowsAffected == 0 {
-		return ErrImageNotFound
+		return appimage.ErrImageNotFound
 	}
 
 	return nil
@@ -187,8 +236,8 @@ type imageScanner interface {
 	Scan(dest ...any) error
 }
 
-func scanImage(scanner imageScanner) (Image, error) {
-	var image Image
+func scanImage(scanner imageScanner) (appimage.Image, error) {
+	var image appimage.Image
 	var protected int
 	var tagsJSON string
 
@@ -206,11 +255,11 @@ func scanImage(scanner imageScanner) (Image, error) {
 		&image.CreatedAt,
 		&image.UpdatedAt,
 	); err != nil {
-		return Image{}, err
+		return appimage.Image{}, err
 	}
 
 	if err := json.Unmarshal([]byte(tagsJSON), &image.Tags); err != nil {
-		return Image{}, err
+		return appimage.Image{}, err
 	}
 	image.Protected = protected != 0
 

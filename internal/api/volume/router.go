@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,7 +28,14 @@ func NewRouterWithService(
 }
 
 func NewHandler(cfg config.Config) Handler {
-	return NewHandlerWithService(cfg, appvolume.NewService())
+	return NewHandlerWithService(
+		cfg,
+		appvolume.NewServiceWithRuntime(
+			storevolume.NewMemoryRepository(),
+			clock.Wall(),
+			idgen.Random(),
+		),
+	)
 }
 
 func NewHandlerWithService(
@@ -45,6 +55,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/volumes/detail", h.listVolumes)
 	router.Post("/{project_id}/volumes", h.createVolume)
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)
+	router.Put("/{project_id}/volumes/{volume_id}", h.updateVolume)
 	router.Delete("/{project_id}/volumes/{volume_id}", h.deleteVolume)
 	router.Get("/{project_id}/types", h.listVolumeTypes)
 	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)

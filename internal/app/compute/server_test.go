@@ -7,6 +7,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/app/compute"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -20,7 +21,11 @@ func TestServerSuite(t *testing.T) {
 
 func (s *ServerSuite) TestCreateServerUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
-	service := compute.NewServiceWithClock(clock.Fixed(now))
+	service := compute.NewServiceWithRuntime(
+		storecompute.NewMemoryServerRepository(),
+		clock.Fixed(now),
+		idgen.Random(),
+	)
 
 	server := service.CreateServer(compute.CreateServer{
 		Name:     "web",
@@ -34,6 +39,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedClock() {
 
 func (s *ServerSuite) TestCreateServerUsesInjectedIDGenerator() {
 	service := compute.NewServiceWithRuntime(
+		storecompute.NewMemoryServerRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)
@@ -50,6 +56,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedIDGenerator() {
 func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
 	service := compute.NewServiceWithRuntime(
+		storecompute.NewMemoryServerRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("server-id"),
 	)
@@ -70,6 +77,7 @@ func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 
 func (s *ServerSuite) TestResetClearsServers() {
 	service := compute.NewServiceWithRuntime(
+		storecompute.NewMemoryServerRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)

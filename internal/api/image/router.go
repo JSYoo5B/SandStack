@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,7 +28,14 @@ func NewRouterWithService(
 }
 
 func NewHandler(cfg config.Config) Handler {
-	return NewHandlerWithService(cfg, appimage.NewService())
+	return NewHandlerWithService(
+		cfg,
+		appimage.NewServiceWithRuntime(
+			storeimage.NewMemoryRepository(),
+			clock.Wall(),
+			idgen.Random(),
+		),
+	)
 }
 
 func NewHandlerWithService(
@@ -44,6 +54,7 @@ func (h Handler) Router() http.Handler {
 	router.Get("/images", h.listImages)
 	router.Post("/images", h.createImage)
 	router.Get("/images/{image_id}", h.getImage)
+	router.Patch("/images/{image_id}", h.updateImage)
 	router.Delete("/images/{image_id}", h.deleteImage)
 
 	return router

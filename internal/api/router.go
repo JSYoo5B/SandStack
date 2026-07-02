@@ -15,7 +15,13 @@ import (
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/app/requestlog"
 	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
+	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
+	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
+	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,10 +31,27 @@ func NewRouter(cfg config.Config) http.Handler {
 	requests := requestlog.NewService()
 	router.Use(recordRequests(requests))
 	identityHandler := identity.NewHandler(cfg)
-	computeService := appcompute.NewService()
-	imageService := appimage.NewService()
-	networkService := appnetwork.NewService()
-	volumeService := appvolume.NewService()
+	computeService := appcompute.NewServiceWithRuntime(
+		storecompute.NewMemoryServerRepository(),
+		clock.Wall(),
+		idgen.Random(),
+	)
+	imageService := appimage.NewServiceWithRuntime(
+		storeimage.NewMemoryRepository(),
+		clock.Wall(),
+		idgen.Random(),
+	)
+	networkService := appnetwork.NewServiceWithRepositories(
+		storenetwork.NewMemoryNetworkRepository(),
+		storenetwork.NewMemorySubnetRepository(),
+		storenetwork.NewMemoryPortRepository(),
+		idgen.Random(),
+	)
+	volumeService := appvolume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
+		clock.Wall(),
+		idgen.Random(),
+	)
 
 	router.Mount("/_sandstack", admin.NewRouterWithState(func() {
 		computeService.Reset()

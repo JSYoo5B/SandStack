@@ -7,6 +7,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/app/volume"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -20,7 +21,11 @@ func TestVolumeSuite(t *testing.T) {
 
 func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
-	service := volume.NewServiceWithClock(clock.Fixed(now))
+	service := volume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
+		clock.Fixed(now),
+		idgen.Random(),
+	)
 
 	created := service.Create(volume.CreateVolume{
 		Size: 1,
@@ -33,6 +38,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 
 func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 	service := volume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -48,6 +54,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
 	service := volume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("volume-id"),
 	)
@@ -66,6 +73,7 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 
 func (s *VolumeSuite) TestResetClearsVolumes() {
 	service := volume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)

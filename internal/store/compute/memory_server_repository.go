@@ -1,21 +1,25 @@
 package compute
 
-import "sync"
+import (
+	"sync"
+
+	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+)
 
 type MemoryServerRepository struct {
 	mu      sync.RWMutex
 	ids     []string
-	servers map[string]Server
+	servers map[string]appcompute.Server
 }
 
 func NewMemoryServerRepository() *MemoryServerRepository {
 	return &MemoryServerRepository{
 		ids:     []string{},
-		servers: map[string]Server{},
+		servers: map[string]appcompute.Server{},
 	}
 }
 
-func (r *MemoryServerRepository) Create(server Server) Server {
+func (r *MemoryServerRepository) Create(server appcompute.Server) appcompute.Server {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -25,11 +29,11 @@ func (r *MemoryServerRepository) Create(server Server) Server {
 	return server
 }
 
-func (r *MemoryServerRepository) List() []Server {
+func (r *MemoryServerRepository) List() []appcompute.Server {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	servers := make([]Server, 0, len(r.ids))
+	servers := make([]appcompute.Server, 0, len(r.ids))
 	for _, id := range r.ids {
 		servers = append(servers, r.servers[id])
 	}
@@ -37,24 +41,26 @@ func (r *MemoryServerRepository) List() []Server {
 	return servers
 }
 
-func (r *MemoryServerRepository) Get(id string) (Server, error) {
+func (r *MemoryServerRepository) Get(id string) (appcompute.Server, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	server, ok := r.servers[id]
 	if !ok {
-		return Server{}, ErrServerNotFound
+		return appcompute.Server{}, appcompute.ErrServerNotFound
 	}
 
 	return server, nil
 }
 
-func (r *MemoryServerRepository) Update(server Server) (Server, error) {
+func (r *MemoryServerRepository) Update(
+	server appcompute.Server,
+) (appcompute.Server, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if _, ok := r.servers[server.ID]; !ok {
-		return Server{}, ErrServerNotFound
+		return appcompute.Server{}, appcompute.ErrServerNotFound
 	}
 
 	r.servers[server.ID] = server
@@ -67,7 +73,7 @@ func (r *MemoryServerRepository) Delete(id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.servers[id]; !ok {
-		return ErrServerNotFound
+		return appcompute.ErrServerNotFound
 	}
 
 	delete(r.servers, id)
@@ -86,5 +92,5 @@ func (r *MemoryServerRepository) Reset() {
 	defer r.mu.Unlock()
 
 	r.ids = []string{}
-	r.servers = map[string]Server{}
+	r.servers = map[string]appcompute.Server{}
 }

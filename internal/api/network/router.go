@@ -5,6 +5,8 @@ import (
 
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,7 +27,15 @@ func NewRouterWithService(
 }
 
 func NewHandler(cfg config.Config) Handler {
-	return NewHandlerWithService(cfg, appnetwork.NewService())
+	return NewHandlerWithService(
+		cfg,
+		appnetwork.NewServiceWithRepositories(
+			storenetwork.NewMemoryNetworkRepository(),
+			storenetwork.NewMemorySubnetRepository(),
+			storenetwork.NewMemoryPortRepository(),
+			idgen.Random(),
+		),
+	)
 }
 
 func NewHandlerWithService(

@@ -1,21 +1,25 @@
 package network
 
-import "sync"
+import (
+	"sync"
+
+	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
+)
 
 type MemoryPortRepository struct {
 	mu    sync.RWMutex
 	ids   []string
-	ports map[string]Port
+	ports map[string]appnetwork.Port
 }
 
 func NewMemoryPortRepository() *MemoryPortRepository {
 	return &MemoryPortRepository{
 		ids:   []string{},
-		ports: map[string]Port{},
+		ports: map[string]appnetwork.Port{},
 	}
 }
 
-func (r *MemoryPortRepository) Create(port Port) Port {
+func (r *MemoryPortRepository) Create(port appnetwork.Port) appnetwork.Port {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -25,11 +29,11 @@ func (r *MemoryPortRepository) Create(port Port) Port {
 	return port
 }
 
-func (r *MemoryPortRepository) List() []Port {
+func (r *MemoryPortRepository) List() []appnetwork.Port {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	ports := make([]Port, 0, len(r.ids))
+	ports := make([]appnetwork.Port, 0, len(r.ids))
 	for _, id := range r.ids {
 		ports = append(ports, r.ports[id])
 	}
@@ -37,13 +41,13 @@ func (r *MemoryPortRepository) List() []Port {
 	return ports
 }
 
-func (r *MemoryPortRepository) Get(id string) (Port, error) {
+func (r *MemoryPortRepository) Get(id string) (appnetwork.Port, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	port, ok := r.ports[id]
 	if !ok {
-		return Port{}, ErrPortNotFound
+		return appnetwork.Port{}, appnetwork.ErrPortNotFound
 	}
 
 	return port, nil
@@ -54,7 +58,7 @@ func (r *MemoryPortRepository) Delete(id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.ports[id]; !ok {
-		return ErrPortNotFound
+		return appnetwork.ErrPortNotFound
 	}
 
 	delete(r.ports, id)
@@ -73,5 +77,5 @@ func (r *MemoryPortRepository) Reset() {
 	defer r.mu.Unlock()
 
 	r.ids = []string{}
-	r.ports = map[string]Port{}
+	r.ports = map[string]appnetwork.Port{}
 }

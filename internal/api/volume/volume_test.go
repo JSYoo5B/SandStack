@@ -64,6 +64,32 @@ func (s *VolumeSuite) TestGetVolume() {
 	s.Assert().Equal("database", found.Name)
 }
 
+func (s *VolumeSuite) TestUpdateVolume() {
+	created := s.createVolume("database")
+	name := "database-updated"
+	description := "updated description"
+
+	updated, err := volumes.Update(
+		s.T().Context(),
+		testhelper.ServiceClient(s.server.URL+"/demo"),
+		created.ID,
+		volumes.UpdateOpts{
+			Name:        &name,
+			Description: &description,
+			Metadata: map[string]string{
+				"role": "database",
+			},
+		},
+	).Extract()
+	s.Require().NoError(err)
+	s.Require().NotNil(updated)
+
+	s.Assert().Equal(created.ID, updated.ID)
+	s.Assert().Equal("database-updated", updated.Name)
+	s.Assert().Equal("updated description", updated.Description)
+	s.Assert().Equal(map[string]string{"role": "database"}, updated.Metadata)
+}
+
 func (s *VolumeSuite) TestDeleteVolume() {
 	created := s.createVolume("database")
 
