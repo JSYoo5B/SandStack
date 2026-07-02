@@ -53,3 +53,11 @@ type ResourceClassRepository interface {
 	Delete(name string) error
 	Reset()
 }
+
+type TraitCatalogRepository interface {
+	Create(name string)
+	List() []string
+	Get(name string) (string, error)
+	Delete(name string) error
+	Reset()
+}
