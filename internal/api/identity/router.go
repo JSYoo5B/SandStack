@@ -25,10 +25,12 @@ func NewHandler(cfg config.Config) Handler {
 		appidentity.NewServiceWithRepositories(
 			cfg,
 			appidentity.Repositories{
-				Users:    storeidentity.NewMemoryUserRepository(),
-				Projects: storeidentity.NewMemoryProjectRepository(),
-				Roles:    storeidentity.NewMemoryRoleRepository(),
-				Tokens:   storeidentity.NewMemoryTokenRepository(),
+				Users:     storeidentity.NewMemoryUserRepository(),
+				Projects:  storeidentity.NewMemoryProjectRepository(),
+				Roles:     storeidentity.NewMemoryRoleRepository(),
+				Tokens:    storeidentity.NewMemoryTokenRepository(),
+				Services:  storeidentity.NewMemoryServiceRepository(),
+				Endpoints: storeidentity.NewMemoryEndpointRepository(),
 			},
 		),
 	)
