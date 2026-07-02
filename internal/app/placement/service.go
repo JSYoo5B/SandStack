@@ -16,6 +16,7 @@ type Service struct {
 	inventoryRepository        InventoryRepository
 	traitRepository            TraitRepository
 	aggregateRepository        AggregateRepository
+	usageRepository            UsageRepository
 	idGen                      idgen.Generator
 }
 
@@ -24,6 +25,7 @@ func NewServiceWithRepositories(
 	inventoryRepository InventoryRepository,
 	traitRepository TraitRepository,
 	aggregateRepository AggregateRepository,
+	usageRepository UsageRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
@@ -31,6 +33,7 @@ func NewServiceWithRepositories(
 		inventoryRepository:        inventoryRepository,
 		traitRepository:            traitRepository,
 		aggregateRepository:        aggregateRepository,
+		usageRepository:            usageRepository,
 		idGen:                      idGen,
 	}
 }
@@ -76,6 +79,7 @@ func (s *Service) DeleteResourceProvider(uuid string) error {
 	s.inventoryRepository.DeleteAll(uuid)
 	s.traitRepository.Delete(uuid)
 	s.aggregateRepository.Delete(uuid)
+	s.usageRepository.Delete(uuid)
 	return nil
 }
 
@@ -249,11 +253,24 @@ func (s *Service) UpdateAggregates(
 	}, nil
 }
 
+func (s *Service) GetUsages(resourceProviderUUID string) (Usages, error) {
+	provider, err := s.resourceProviderRepository.Get(resourceProviderUUID)
+	if err != nil {
+		return Usages{}, err
+	}
+
+	return Usages{
+		ResourceProviderGeneration: provider.Generation,
+		Usages:                     s.usageRepository.Get(resourceProviderUUID),
+	}, nil
+}
+
 func (s *Service) Reset() {
 	s.resourceProviderRepository.Reset()
 	s.inventoryRepository.Reset()
 	s.traitRepository.Reset()
 	s.aggregateRepository.Reset()
+	s.usageRepository.Reset()
 }
 
 func intPtr(value int) *int {

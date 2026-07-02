@@ -58,3 +58,8 @@ type UpdateAggregates struct {
 	ResourceProviderGeneration *int
 	Aggregates                 []string
 }
+
+type Usages struct {
+	ResourceProviderGeneration int
+	Usages                     map[string]int
+}

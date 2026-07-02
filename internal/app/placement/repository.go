@@ -31,3 +31,10 @@ type AggregateRepository interface {
 	Delete(resourceProviderUUID string)
 	Reset()
 }
+
+type UsageRepository interface {
+	Set(resourceProviderUUID string, usages map[string]int)
+	Get(resourceProviderUUID string) map[string]int
+	Delete(resourceProviderUUID string)
+	Reset()
+}
