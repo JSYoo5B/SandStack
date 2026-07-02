@@ -23,6 +23,9 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
+		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -40,6 +43,9 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
+		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -56,16 +62,31 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 func (s *ServiceSuite) TestResetClearsImages() {
 	service := image.NewServiceWithRuntime(
 		storeimage.NewMemoryRepository(),
+		storeimage.NewMemoryDataRepository(),
+		storeimage.NewMemoryMemberRepository(),
+		storeimage.NewMemoryTaskRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
-	service.Create(image.CreateImage{
+	created := service.Create(image.CreateImage{
 		Name:            "ubuntu",
 		ContainerFormat: "bare",
 		DiskFormat:      "qcow2",
 	})
+	err := service.UploadData(created.ID, []byte("image-data"))
+	s.Require().NoError(err)
+	_, err = service.CreateMember(created.ID, "project-1")
+	s.Require().NoError(err)
+	task := service.CreateTask(image.CreateTask{Type: "import"})
 
 	service.Reset()
 
 	s.Assert().Empty(service.List())
+	_, err = service.DownloadData(created.ID)
+	s.ErrorIs(err, image.ErrImageNotFound)
+	members, err := service.ListMembers(created.ID)
+	s.ErrorIs(err, image.ErrImageNotFound)
+	s.Nil(members)
+	_, err = service.GetTask(task.ID)
+	s.ErrorIs(err, image.ErrTaskNotFound)
 }

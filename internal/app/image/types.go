@@ -20,6 +20,33 @@ type Image struct {
 	Protected       bool
 	Visibility      string
 	Tags            []string
+	SizeBytes       int64
 	CreatedAt       string
 	UpdatedAt       string
+}
+
+type Member struct {
+	ImageID   string
+	MemberID  string
+	Status    string
+	CreatedAt string
+	UpdatedAt string
+}
+
+type Task struct {
+	ID        string
+	Type      string
+	Status    string
+	Input     map[string]any
+	Result    map[string]any
+	Owner     string
+	Message   string
+	ExpiresAt string
+	CreatedAt string
+	UpdatedAt string
+}
+
+type CreateTask struct {
+	Type  string
+	Input map[string]any
 }

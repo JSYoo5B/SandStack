@@ -32,6 +32,9 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appimage.NewServiceWithRuntime(
 			storeimage.NewMemoryRepository(),
+			storeimage.NewMemoryDataRepository(),
+			storeimage.NewMemoryMemberRepository(),
+			storeimage.NewMemoryTaskRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -56,6 +59,19 @@ func (h Handler) Router() http.Handler {
 	router.Get("/images/{image_id}", h.getImage)
 	router.Patch("/images/{image_id}", h.updateImage)
 	router.Delete("/images/{image_id}", h.deleteImage)
+	router.Put("/images/{image_id}/file", h.uploadImageData)
+	router.Get("/images/{image_id}/file", h.downloadImageData)
+	router.Put("/images/{image_id}/stage", h.stageImageData)
+	router.Post("/images/{image_id}/import", h.importImageData)
+	router.Get("/info/import", h.getImportInfo)
+	router.Get("/tasks", h.listTasks)
+	router.Post("/tasks", h.createTask)
+	router.Get("/tasks/{task_id}", h.getTask)
+	router.Get("/images/{image_id}/members", h.listMembers)
+	router.Post("/images/{image_id}/members", h.createMember)
+	router.Get("/images/{image_id}/members/{member_id}", h.getMember)
+	router.Put("/images/{image_id}/members/{member_id}", h.updateMember)
+	router.Delete("/images/{image_id}/members/{member_id}", h.deleteMember)
 
 	return router
 }
