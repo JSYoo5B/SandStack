@@ -77,3 +77,8 @@ type Limits struct {
 	TotalSecurityGroupsUsed int
 	TotalServerGroupsUsed   int
 }
+
+type AvailabilityZone struct {
+	Name      string
+	Available bool
+}
