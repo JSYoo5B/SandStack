@@ -4,13 +4,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/JSYoo5B/SandStack/internal/app/compute"
+	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	"github.com/stretchr/testify/suite"
 )
 
 type SQLiteServerRepositorySuite struct {
 	suite.Suite
-	repository *compute.SQLiteServerRepository
+	repository *storecompute.SQLiteServerRepository
 }
 
 func TestSQLiteServerRepositorySuite(t *testing.T) {
@@ -18,7 +19,7 @@ func TestSQLiteServerRepositorySuite(t *testing.T) {
 }
 
 func (s *SQLiteServerRepositorySuite) SetupTest() {
-	repository, err := compute.OpenSQLiteServerRepository(":memory:")
+	repository, err := storecompute.OpenSQLiteServerRepository(":memory:")
 	s.Require().NoError(err)
 
 	s.repository = repository
@@ -51,7 +52,7 @@ func (s *SQLiteServerRepositorySuite) TestDeleteServer() {
 	s.Require().NoError(err)
 
 	_, err = s.repository.Get(created.ID)
-	s.Require().ErrorIs(err, compute.ErrServerNotFound)
+	s.Require().ErrorIs(err, appcompute.ErrServerNotFound)
 	s.Assert().Empty(s.repository.List())
 }
 
@@ -65,13 +66,13 @@ func (s *SQLiteServerRepositorySuite) TestResetClearsServers() {
 
 func (s *SQLiteServerRepositorySuite) TestFileBackedDatabasePersistsServers() {
 	path := filepath.Join(s.T().TempDir(), "sandstack.db")
-	repository, err := compute.OpenSQLiteServerRepository(path)
+	repository, err := storecompute.OpenSQLiteServerRepository(path)
 	s.Require().NoError(err)
 
 	created := repository.Create(serverFixture("srv-1"))
 	s.Require().NoError(repository.Close())
 
-	reopened, err := compute.OpenSQLiteServerRepository(path)
+	reopened, err := storecompute.OpenSQLiteServerRepository(path)
 	s.Require().NoError(err)
 	defer reopened.Close()
 
@@ -81,8 +82,8 @@ func (s *SQLiteServerRepositorySuite) TestFileBackedDatabasePersistsServers() {
 	s.Assert().Equal(created, found)
 }
 
-func serverFixture(id string) compute.Server {
-	return compute.Server{
+func serverFixture(id string) appcompute.Server {
+	return appcompute.Server{
 		ID:        id,
 		Name:      "web",
 		ImageID:   "img-1",
