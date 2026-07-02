@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
 	_ "modernc.org/sqlite"
 )
 
@@ -53,7 +54,7 @@ func (r *SQLiteRepository) Close() error {
 	return r.db.Close()
 }
 
-func (r *SQLiteRepository) Create(volume Volume) Volume {
+func (r *SQLiteRepository) Create(volume appvolume.Volume) appvolume.Volume {
 	metadataJSON := marshalStringMap(volume.Metadata)
 	_, err := r.db.Exec(
 		`INSERT INTO volumes (
@@ -90,7 +91,7 @@ func (r *SQLiteRepository) Create(volume Volume) Volume {
 	return volume
 }
 
-func (r *SQLiteRepository) List() []Volume {
+func (r *SQLiteRepository) List() []appvolume.Volume {
 	rows, err := r.db.Query(`
 SELECT
 	id,
@@ -112,7 +113,7 @@ ORDER BY sequence`)
 	}
 	defer rows.Close()
 
-	volumes := []Volume{}
+	volumes := []appvolume.Volume{}
 	for rows.Next() {
 		volume, err := scanVolume(rows)
 		if err != nil {
@@ -127,7 +128,7 @@ ORDER BY sequence`)
 	return volumes
 }
 
-func (r *SQLiteRepository) Get(id string) (Volume, error) {
+func (r *SQLiteRepository) Get(id string) (appvolume.Volume, error) {
 	row := r.db.QueryRow(`
 SELECT
 	id,
@@ -147,16 +148,16 @@ WHERE id = ?`, id)
 
 	volume, err := scanVolume(row)
 	if errors.Is(err, sql.ErrNoRows) {
-		return Volume{}, ErrVolumeNotFound
+		return appvolume.Volume{}, appvolume.ErrVolumeNotFound
 	}
 	if err != nil {
-		return Volume{}, err
+		return appvolume.Volume{}, err
 	}
 
 	return volume, nil
 }
 
-func (r *SQLiteRepository) Update(volume Volume) (Volume, error) {
+func (r *SQLiteRepository) Update(volume appvolume.Volume) (appvolume.Volume, error) {
 	metadataJSON := marshalStringMap(volume.Metadata)
 	result, err := r.db.Exec(
 		`UPDATE volumes
@@ -186,15 +187,15 @@ func (r *SQLiteRepository) Update(volume Volume) (Volume, error) {
 		volume.ID,
 	)
 	if err != nil {
-		return Volume{}, err
+		return appvolume.Volume{}, err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return Volume{}, err
+		return appvolume.Volume{}, err
 	}
 	if rowsAffected == 0 {
-		return Volume{}, ErrVolumeNotFound
+		return appvolume.Volume{}, appvolume.ErrVolumeNotFound
 	}
 
 	return volume, nil
@@ -211,7 +212,7 @@ func (r *SQLiteRepository) Delete(id string) error {
 		return err
 	}
 	if rowsAffected == 0 {
-		return ErrVolumeNotFound
+		return appvolume.ErrVolumeNotFound
 	}
 
 	return nil
@@ -227,8 +228,8 @@ type volumeScanner interface {
 	Scan(dest ...any) error
 }
 
-func scanVolume(scanner volumeScanner) (Volume, error) {
-	var volume Volume
+func scanVolume(scanner volumeScanner) (appvolume.Volume, error) {
+	var volume appvolume.Volume
 	var metadataJSON string
 	var encrypted int
 	var multiattach int
@@ -247,11 +248,11 @@ func scanVolume(scanner volumeScanner) (Volume, error) {
 		&encrypted,
 		&multiattach,
 	); err != nil {
-		return Volume{}, err
+		return appvolume.Volume{}, err
 	}
 
 	if err := json.Unmarshal([]byte(metadataJSON), &volume.Metadata); err != nil {
-		return Volume{}, err
+		return appvolume.Volume{}, err
 	}
 	volume.Encrypted = encrypted != 0
 	volume.Multiattach = multiattach != 0

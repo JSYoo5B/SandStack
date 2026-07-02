@@ -4,13 +4,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/JSYoo5B/SandStack/internal/app/volume"
+	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
+	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/stretchr/testify/suite"
 )
 
 type SQLiteRepositorySuite struct {
 	suite.Suite
-	repository *volume.SQLiteRepository
+	repository *storevolume.SQLiteRepository
 }
 
 func TestSQLiteRepositorySuite(t *testing.T) {
@@ -18,7 +19,7 @@ func TestSQLiteRepositorySuite(t *testing.T) {
 }
 
 func (s *SQLiteRepositorySuite) SetupTest() {
-	repository, err := volume.OpenSQLiteRepository(":memory:")
+	repository, err := storevolume.OpenSQLiteRepository(":memory:")
 	s.Require().NoError(err)
 
 	s.repository = repository
@@ -50,7 +51,7 @@ func (s *SQLiteRepositorySuite) TestDeleteVolume() {
 	s.Require().NoError(err)
 
 	_, err = s.repository.Get(created.ID)
-	s.Require().ErrorIs(err, volume.ErrVolumeNotFound)
+	s.Require().ErrorIs(err, appvolume.ErrVolumeNotFound)
 	s.Assert().Empty(s.repository.List())
 }
 
@@ -64,13 +65,13 @@ func (s *SQLiteRepositorySuite) TestResetClearsVolumes() {
 
 func (s *SQLiteRepositorySuite) TestFileBackedDatabasePersistsVolumes() {
 	path := filepath.Join(s.T().TempDir(), "sandstack.db")
-	repository, err := volume.OpenSQLiteRepository(path)
+	repository, err := storevolume.OpenSQLiteRepository(path)
 	s.Require().NoError(err)
 
 	created := repository.Create(volumeFixture("vol-1"))
 	s.Require().NoError(repository.Close())
 
-	reopened, err := volume.OpenSQLiteRepository(path)
+	reopened, err := storevolume.OpenSQLiteRepository(path)
 	s.Require().NoError(err)
 	defer reopened.Close()
 
@@ -80,8 +81,8 @@ func (s *SQLiteRepositorySuite) TestFileBackedDatabasePersistsVolumes() {
 	s.Assert().Equal(created, found)
 }
 
-func volumeFixture(id string) volume.Volume {
-	return volume.Volume{
+func volumeFixture(id string) appvolume.Volume {
+	return appvolume.Volume{
 		ID:          id,
 		Status:      "creating",
 		Size:        1,
