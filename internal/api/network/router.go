@@ -37,6 +37,7 @@ func NewHandler(cfg config.Config) Handler {
 			storenetwork.NewMemorySecurityGroupRuleRepository(),
 			storenetwork.NewMemoryRouterRepository(),
 			storenetwork.NewMemoryFloatingIPRepository(),
+			storenetwork.NewMemoryRouterInterfaceRepository(),
 			idgen.Random(),
 		),
 	)
@@ -79,6 +80,8 @@ func (h Handler) Router() http.Handler {
 	router.Post("/routers", h.createRouter)
 	router.Get("/routers/{router_id}", h.getRouter)
 	router.Delete("/routers/{router_id}", h.deleteRouter)
+	router.Put("/routers/{router_id}/add_router_interface", h.addRouterInterface)
+	router.Put("/routers/{router_id}/remove_router_interface", h.removeRouterInterface)
 	router.Get("/floatingips", h.listFloatingIPs)
 	router.Post("/floatingips", h.createFloatingIP)
 	router.Get("/floatingips/{floating_ip_id}", h.getFloatingIP)

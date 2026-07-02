@@ -56,3 +56,10 @@ type FloatingIPRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type RouterInterfaceRepository interface {
+	Create(routerInterface RouterInterface) RouterInterface
+	Find(routerID string, request RouterInterfaceRequest) (RouterInterface, error)
+	Delete(id string) error
+	Reset()
+}

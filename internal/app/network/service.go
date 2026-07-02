@@ -7,15 +7,16 @@ import (
 )
 
 type Service struct {
-	mu                      sync.RWMutex
-	networkRepository       NetworkRepository
-	subnetRepository        SubnetRepository
-	portRepository          PortRepository
-	securityGroupRepository SecurityGroupRepository
-	securityRuleRepository  SecurityGroupRuleRepository
-	routerRepository        RouterRepository
-	floatingIPRepository    FloatingIPRepository
-	idGen                   idgen.Generator
+	mu                        sync.RWMutex
+	networkRepository         NetworkRepository
+	subnetRepository          SubnetRepository
+	portRepository            PortRepository
+	securityGroupRepository   SecurityGroupRepository
+	securityRuleRepository    SecurityGroupRuleRepository
+	routerRepository          RouterRepository
+	floatingIPRepository      FloatingIPRepository
+	routerInterfaceRepository RouterInterfaceRepository
+	idGen                     idgen.Generator
 }
 
 func NewServiceWithRepositories(
@@ -26,17 +27,19 @@ func NewServiceWithRepositories(
 	securityRuleRepository SecurityGroupRuleRepository,
 	routerRepository RouterRepository,
 	floatingIPRepository FloatingIPRepository,
+	routerInterfaceRepository RouterInterfaceRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
-		networkRepository:       networkRepository,
-		subnetRepository:        subnetRepository,
-		portRepository:          portRepository,
-		securityGroupRepository: securityGroupRepository,
-		securityRuleRepository:  securityRuleRepository,
-		routerRepository:        routerRepository,
-		floatingIPRepository:    floatingIPRepository,
-		idGen:                   idGen,
+		networkRepository:         networkRepository,
+		subnetRepository:          subnetRepository,
+		portRepository:            portRepository,
+		securityGroupRepository:   securityGroupRepository,
+		securityRuleRepository:    securityRuleRepository,
+		routerRepository:          routerRepository,
+		floatingIPRepository:      floatingIPRepository,
+		routerInterfaceRepository: routerInterfaceRepository,
+		idGen:                     idGen,
 	}
 }
 
@@ -51,4 +54,5 @@ func (s *Service) Reset() {
 	s.securityRuleRepository.Reset()
 	s.routerRepository.Reset()
 	s.floatingIPRepository.Reset()
+	s.routerInterfaceRepository.Reset()
 }
