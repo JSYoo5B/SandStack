@@ -33,6 +33,7 @@ func NewHandler(cfg config.Config) Handler {
 			storenetwork.NewMemoryNetworkRepository(),
 			storenetwork.NewMemorySubnetRepository(),
 			storenetwork.NewMemoryPortRepository(),
+			storenetwork.NewMemorySecurityGroupRepository(),
 			idgen.Random(),
 		),
 	)
@@ -63,6 +64,10 @@ func (h Handler) Router() http.Handler {
 	router.Post("/ports", h.createPort)
 	router.Get("/ports/{port_id}", h.getPort)
 	router.Delete("/ports/{port_id}", h.deletePort)
+	router.Get("/security-groups", h.listSecurityGroups)
+	router.Post("/security-groups", h.createSecurityGroup)
+	router.Get("/security-groups/{security_group_id}", h.getSecurityGroup)
+	router.Delete("/security-groups/{security_group_id}", h.deleteSecurityGroup)
 
 	return router
 }

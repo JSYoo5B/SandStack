@@ -24,3 +24,11 @@ type PortRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type SecurityGroupRepository interface {
+	Create(securityGroup SecurityGroup) SecurityGroup
+	List() []SecurityGroup
+	Get(id string) (SecurityGroup, error)
+	Delete(id string) error
+	Reset()
+}

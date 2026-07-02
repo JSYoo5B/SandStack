@@ -7,24 +7,27 @@ import (
 )
 
 type Service struct {
-	mu                sync.RWMutex
-	networkRepository NetworkRepository
-	subnetRepository  SubnetRepository
-	portRepository    PortRepository
-	idGen             idgen.Generator
+	mu                      sync.RWMutex
+	networkRepository       NetworkRepository
+	subnetRepository        SubnetRepository
+	portRepository          PortRepository
+	securityGroupRepository SecurityGroupRepository
+	idGen                   idgen.Generator
 }
 
 func NewServiceWithRepositories(
 	networkRepository NetworkRepository,
 	subnetRepository SubnetRepository,
 	portRepository PortRepository,
+	securityGroupRepository SecurityGroupRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
-		networkRepository: networkRepository,
-		subnetRepository:  subnetRepository,
-		portRepository:    portRepository,
-		idGen:             idGen,
+		networkRepository:       networkRepository,
+		subnetRepository:        subnetRepository,
+		portRepository:          portRepository,
+		securityGroupRepository: securityGroupRepository,
+		idGen:                   idGen,
 	}
 }
 
@@ -35,4 +38,5 @@ func (s *Service) Reset() {
 	s.networkRepository.Reset()
 	s.subnetRepository.Reset()
 	s.portRepository.Reset()
+	s.securityGroupRepository.Reset()
 }
