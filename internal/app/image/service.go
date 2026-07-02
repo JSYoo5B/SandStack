@@ -2,31 +2,51 @@ package image
 
 import (
 	"errors"
-	"sync"
 	"time"
 
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 var ErrImageNotFound = errors.New("image not found")
 
 type Service struct {
-	mu     sync.RWMutex
-	ids    []string
-	images map[string]Image
+	repository Repository
+	clock      clock.Clock
+	idGen      idgen.Generator
 }
 
 func NewService() *Service {
+	return NewServiceWithRuntime(clock.Wall(), idgen.Random())
+}
+
+func NewServiceWithClock(clock clock.Clock) *Service {
+	return NewServiceWithRuntime(clock, idgen.Random())
+}
+
+func NewServiceWithRuntime(
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
+	return NewServiceWithRepository(NewMemoryRepository(), clock, idGen)
+}
+
+func NewServiceWithRepository(
+	repository Repository,
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
 	return &Service{
-		ids:    []string{},
-		images: map[string]Image{},
+		repository: repository,
+		clock:      clock,
+		idGen:      idGen,
 	}
 }
 
 func (s *Service) Create(input CreateImage) Image {
-	now := time.Now().UTC()
+	now := s.clock.Now().UTC()
 	image := Image{
-		ID:              "img-" + idgen.RandomHex(16),
+		ID:              "img-" + s.idGen.Hex(16),
 		Name:            input.Name,
 		Status:          "queued",
 		ContainerFormat: input.ContainerFormat,
@@ -40,54 +60,21 @@ func (s *Service) Create(input CreateImage) Image {
 		UpdatedAt:       now.Format(time.RFC3339),
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ids = append(s.ids, image.ID)
-	s.images[image.ID] = image
-
-	return image
+	return s.repository.Create(image)
 }
 
 func (s *Service) List() []Image {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	images := make([]Image, 0, len(s.ids))
-	for _, id := range s.ids {
-		images = append(images, s.images[id])
-	}
-
-	return images
+	return s.repository.List()
 }
 
 func (s *Service) Get(id string) (Image, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	image, ok := s.images[id]
-	if !ok {
-		return Image{}, ErrImageNotFound
-	}
-
-	return image, nil
+	return s.repository.Get(id)
 }
 
 func (s *Service) Delete(id string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	return s.repository.Delete(id)
+}
 
-	if _, ok := s.images[id]; !ok {
-		return ErrImageNotFound
-	}
-
-	delete(s.images, id)
-	for index, currentID := range s.ids {
-		if currentID == id {
-			s.ids = append(s.ids[:index], s.ids[index+1:]...)
-			break
-		}
-	}
-
-	return nil
+func (s *Service) Reset() {
+	s.repository.Reset()
 }

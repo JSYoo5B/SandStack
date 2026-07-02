@@ -17,10 +17,24 @@ func NewRouter(cfg config.Config) http.Handler {
 	return NewHandler(cfg).Router()
 }
 
+func NewRouterWithService(
+	cfg config.Config,
+	service *appimage.Service,
+) http.Handler {
+	return NewHandlerWithService(cfg, service).Router()
+}
+
 func NewHandler(cfg config.Config) Handler {
+	return NewHandlerWithService(cfg, appimage.NewService())
+}
+
+func NewHandlerWithService(
+	cfg config.Config,
+	service *appimage.Service,
+) Handler {
 	return Handler{
 		config:  cfg,
-		service: appimage.NewService(),
+		service: service,
 	}
 }
 

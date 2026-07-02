@@ -1,0 +1,80 @@
+package volume_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/JSYoo5B/SandStack/internal/app/volume"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	"github.com/stretchr/testify/suite"
+)
+
+type VolumeSuite struct {
+	suite.Suite
+}
+
+func TestVolumeSuite(t *testing.T) {
+	suite.Run(t, new(VolumeSuite))
+}
+
+func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
+	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
+	service := volume.NewServiceWithClock(clock.Fixed(now))
+
+	created := service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	s.Assert().Equal("2026-06-23T08:30:00.123456", created.CreatedAt)
+	s.Assert().Equal("2026-06-23T08:30:00.123456", created.UpdatedAt)
+}
+
+func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("volume-id"),
+	)
+
+	created := service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	s.Assert().Equal("vol-volume-id", created.ID)
+}
+
+func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
+	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(now),
+		idgen.Fixed("volume-id"),
+	)
+	created := service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	found, err := service.Get(created.ID)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("creating", created.Status)
+	s.Assert().Equal("available", found.Status)
+	s.Assert().Equal("2026-06-23T08:30:00.123456", found.UpdatedAt)
+}
+
+func (s *VolumeSuite) TestResetClearsVolumes() {
+	service := volume.NewServiceWithRuntime(
+		clock.Fixed(time.Time{}),
+		idgen.Fixed("volume-id"),
+	)
+	service.Create(volume.CreateVolume{
+		Size: 1,
+		Name: "database",
+	})
+
+	service.Reset()
+
+	s.Assert().Empty(service.List())
+}
