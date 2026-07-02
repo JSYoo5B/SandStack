@@ -23,76 +23,40 @@ func (s *Service) Create(input CreateVolume) Volume {
 		Bootable:    "false",
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ids = append(s.ids, volume.ID)
-	s.volumes[volume.ID] = volume
-
-	return volume
+	return s.repository.Create(volume)
 }
 
 func (s *Service) List() []Volume {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.makeVolumesAvailableLocked()
-
-	volumes := make([]Volume, 0, len(s.ids))
-	for _, id := range s.ids {
-		volumes = append(volumes, s.volumes[id])
+	volumes := s.repository.List()
+	for index, volume := range volumes {
+		volumes[index] = s.makeVolumeAvailable(volume)
 	}
 
 	return volumes
 }
 
 func (s *Service) Get(id string) (Volume, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	volume, ok := s.volumes[id]
-	if !ok {
-		return Volume{}, ErrVolumeNotFound
+	volume, err := s.repository.Get(id)
+	if err != nil {
+		return Volume{}, err
 	}
 
-	volume = s.makeVolumeAvailableLocked(volume)
-	s.volumes[id] = volume
-
-	return volume, nil
+	return s.makeVolumeAvailable(volume), nil
 }
 
 func (s *Service) Delete(id string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, ok := s.volumes[id]; !ok {
-		return ErrVolumeNotFound
-	}
-
-	delete(s.volumes, id)
-	for index, currentID := range s.ids {
-		if currentID == id {
-			s.ids = append(s.ids[:index], s.ids[index+1:]...)
-			break
-		}
-	}
-
-	return nil
+	return s.repository.Delete(id)
 }
 
-func (s *Service) makeVolumesAvailableLocked() {
-	for _, id := range s.ids {
-		s.volumes[id] = s.makeVolumeAvailableLocked(s.volumes[id])
-	}
-}
-
-func (s *Service) makeVolumeAvailableLocked(volume Volume) Volume {
+func (s *Service) makeVolumeAvailable(volume Volume) Volume {
 	if volume.Status != "creating" {
 		return volume
 	}
 
 	volume.Status = "available"
 	volume.UpdatedAt = s.clock.Now().UTC().Format(timestampFormat)
+
+	_, _ = s.repository.Update(volume)
 
 	return volume
 }
