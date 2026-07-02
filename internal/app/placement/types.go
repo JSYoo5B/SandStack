@@ -48,3 +48,13 @@ type UpdateTraits struct {
 	ResourceProviderGeneration int
 	Traits                     []string
 }
+
+type Aggregates struct {
+	ResourceProviderGeneration *int
+	Aggregates                 []string
+}
+
+type UpdateAggregates struct {
+	ResourceProviderGeneration *int
+	Aggregates                 []string
+}
