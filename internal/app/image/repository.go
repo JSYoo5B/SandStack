@@ -8,3 +8,10 @@ type Repository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type DataRepository interface {
+	Put(id string, data []byte)
+	Get(id string) ([]byte, error)
+	Delete(id string)
+	Reset()
+}

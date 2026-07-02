@@ -11,20 +11,23 @@ import (
 var ErrImageNotFound = errors.New("image not found")
 
 type Service struct {
-	repository Repository
-	clock      clock.Clock
-	idGen      idgen.Generator
+	repository     Repository
+	dataRepository DataRepository
+	clock          clock.Clock
+	idGen          idgen.Generator
 }
 
 func NewServiceWithRuntime(
 	repository Repository,
+	dataRepository DataRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
-		repository: repository,
-		clock:      clock,
-		idGen:      idGen,
+		repository:     repository,
+		dataRepository: dataRepository,
+		clock:          clock,
+		idGen:          idGen,
 	}
 }
 
@@ -57,9 +60,14 @@ func (s *Service) Get(id string) (Image, error) {
 }
 
 func (s *Service) Delete(id string) error {
-	return s.repository.Delete(id)
+	if err := s.repository.Delete(id); err != nil {
+		return err
+	}
+	s.dataRepository.Delete(id)
+	return nil
 }
 
 func (s *Service) Reset() {
 	s.repository.Reset()
+	s.dataRepository.Reset()
 }
