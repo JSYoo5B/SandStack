@@ -7,15 +7,7 @@ import (
 var ErrSubnetNotFound = errors.New("subnet not found")
 
 func (s *Service) ListSubnets() []Subnet {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	subnets := make([]Subnet, 0, len(s.subnetIDs))
-	for _, id := range s.subnetIDs {
-		subnets = append(subnets, s.subnets[id])
-	}
-
-	return subnets
+	return s.subnetRepository.List()
 }
 
 func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
@@ -41,8 +33,7 @@ func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.subnetIDs = append(s.subnetIDs, subnet.ID)
-	s.subnets[subnet.ID] = subnet
+	s.subnetRepository.Create(subnet)
 
 	network, err := s.networkRepository.Get(subnet.NetworkID)
 	if err == nil {
@@ -54,32 +45,20 @@ func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
 }
 
 func (s *Service) GetSubnet(id string) (Subnet, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	subnet, ok := s.subnets[id]
-	if !ok {
-		return Subnet{}, ErrSubnetNotFound
-	}
-
-	return subnet, nil
+	return s.subnetRepository.Get(id)
 }
 
 func (s *Service) DeleteSubnet(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	subnet, ok := s.subnets[id]
-	if !ok {
-		return ErrSubnetNotFound
+	subnet, err := s.subnetRepository.Get(id)
+	if err != nil {
+		return err
 	}
 
-	delete(s.subnets, id)
-	for index, currentID := range s.subnetIDs {
-		if currentID == id {
-			s.subnetIDs = append(s.subnetIDs[:index], s.subnetIDs[index+1:]...)
-			break
-		}
+	if err := s.subnetRepository.Delete(id); err != nil {
+		return err
 	}
 
 	network, err := s.networkRepository.Get(subnet.NetworkID)

@@ -8,3 +8,11 @@ type NetworkRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type SubnetRepository interface {
+	Create(subnet Subnet) Subnet
+	List() []Subnet
+	Get(id string) (Subnet, error)
+	Delete(id string) error
+	Reset()
+}
