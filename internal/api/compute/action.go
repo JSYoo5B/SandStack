@@ -23,6 +23,8 @@ func (h Handler) actionServer(w http.ResponseWriter, r *http.Request) {
 		err = h.service.StartServer(chi.URLParam(r, "server_id"))
 	case request.Has("os-stop"):
 		err = h.service.StopServer(chi.URLParam(r, "server_id"))
+	case request.Has("reboot"):
+		err = h.service.RebootServer(chi.URLParam(r, "server_id"))
 	default:
 		respond.Error(w, http.StatusBadRequest, "unsupported server action")
 		return
