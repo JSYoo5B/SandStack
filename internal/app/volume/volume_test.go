@@ -27,6 +27,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
 		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -47,6 +48,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
 		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -67,6 +69,7 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
 		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("volume-id"),
 	)
@@ -90,6 +93,7 @@ func (s *VolumeSuite) TestResetClearsVolumes() {
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
 		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
