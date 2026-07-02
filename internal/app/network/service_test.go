@@ -5,6 +5,7 @@ import (
 
 	"github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storenetwork "github.com/JSYoo5B/SandStack/internal/store/network"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,7 +18,7 @@ func TestServiceSuite(t *testing.T) {
 }
 
 func (s *ServiceSuite) TestCreateNetworkUsesInjectedIDGenerator() {
-	service := network.NewServiceWithIDGenerator(idgen.Fixed("network-id"))
+	service := newService(idgen.Fixed("network-id"))
 
 	created := service.Create(network.CreateNetwork{Name: "private"})
 
@@ -25,7 +26,7 @@ func (s *ServiceSuite) TestCreateNetworkUsesInjectedIDGenerator() {
 }
 
 func (s *ServiceSuite) TestCreateSubnetUsesInjectedIDGenerator() {
-	service := network.NewServiceWithIDGenerator(idgen.Fixed("subnet-id"))
+	service := newService(idgen.Fixed("subnet-id"))
 
 	created := service.CreateSubnet(network.CreateSubnet{
 		NetworkID: "net-1",
@@ -36,7 +37,7 @@ func (s *ServiceSuite) TestCreateSubnetUsesInjectedIDGenerator() {
 }
 
 func (s *ServiceSuite) TestCreatePortUsesInjectedIDGenerator() {
-	service := network.NewServiceWithIDGenerator(idgen.Fixed("port-id"))
+	service := newService(idgen.Fixed("port-id"))
 
 	created := service.CreatePort(network.CreatePort{
 		NetworkID: "net-1",
@@ -48,7 +49,7 @@ func (s *ServiceSuite) TestCreatePortUsesInjectedIDGenerator() {
 }
 
 func (s *ServiceSuite) TestResetClearsNetworkResources() {
-	service := network.NewServiceWithIDGenerator(idgen.Fixed("network-id"))
+	service := newService(idgen.Fixed("network-id"))
 	created := service.Create(network.CreateNetwork{Name: "private"})
 	service.CreateSubnet(network.CreateSubnet{NetworkID: created.ID})
 	service.CreatePort(network.CreatePort{NetworkID: created.ID})
@@ -58,4 +59,13 @@ func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	s.Assert().Empty(service.List())
 	s.Assert().Empty(service.ListSubnets())
 	s.Assert().Empty(service.ListPorts())
+}
+
+func newService(idGen idgen.Generator) *network.Service {
+	return network.NewServiceWithRepositories(
+		storenetwork.NewMemoryNetworkRepository(),
+		storenetwork.NewMemorySubnetRepository(),
+		storenetwork.NewMemoryPortRepository(),
+		idGen,
+	)
 }

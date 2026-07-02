@@ -1,21 +1,25 @@
 package network
 
-import "sync"
+import (
+	"sync"
+
+	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
+)
 
 type MemorySubnetRepository struct {
 	mu      sync.RWMutex
 	ids     []string
-	subnets map[string]Subnet
+	subnets map[string]appnetwork.Subnet
 }
 
 func NewMemorySubnetRepository() *MemorySubnetRepository {
 	return &MemorySubnetRepository{
 		ids:     []string{},
-		subnets: map[string]Subnet{},
+		subnets: map[string]appnetwork.Subnet{},
 	}
 }
 
-func (r *MemorySubnetRepository) Create(subnet Subnet) Subnet {
+func (r *MemorySubnetRepository) Create(subnet appnetwork.Subnet) appnetwork.Subnet {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -25,11 +29,11 @@ func (r *MemorySubnetRepository) Create(subnet Subnet) Subnet {
 	return subnet
 }
 
-func (r *MemorySubnetRepository) List() []Subnet {
+func (r *MemorySubnetRepository) List() []appnetwork.Subnet {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	subnets := make([]Subnet, 0, len(r.ids))
+	subnets := make([]appnetwork.Subnet, 0, len(r.ids))
 	for _, id := range r.ids {
 		subnets = append(subnets, r.subnets[id])
 	}
@@ -37,13 +41,13 @@ func (r *MemorySubnetRepository) List() []Subnet {
 	return subnets
 }
 
-func (r *MemorySubnetRepository) Get(id string) (Subnet, error) {
+func (r *MemorySubnetRepository) Get(id string) (appnetwork.Subnet, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	subnet, ok := r.subnets[id]
 	if !ok {
-		return Subnet{}, ErrSubnetNotFound
+		return appnetwork.Subnet{}, appnetwork.ErrSubnetNotFound
 	}
 
 	return subnet, nil
@@ -54,7 +58,7 @@ func (r *MemorySubnetRepository) Delete(id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.subnets[id]; !ok {
-		return ErrSubnetNotFound
+		return appnetwork.ErrSubnetNotFound
 	}
 
 	delete(r.subnets, id)
@@ -73,5 +77,5 @@ func (r *MemorySubnetRepository) Reset() {
 	defer r.mu.Unlock()
 
 	r.ids = []string{}
-	r.subnets = map[string]Subnet{}
+	r.subnets = map[string]appnetwork.Subnet{}
 }

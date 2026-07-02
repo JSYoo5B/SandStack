@@ -14,19 +14,6 @@ type Service struct {
 	idGen             idgen.Generator
 }
 
-func NewService() *Service {
-	return NewServiceWithIDGenerator(idgen.Random())
-}
-
-func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
-	return NewServiceWithRepositories(
-		NewMemoryNetworkRepository(),
-		NewMemorySubnetRepository(),
-		NewMemoryPortRepository(),
-		idGen,
-	)
-}
-
 func NewServiceWithRepositories(
 	networkRepository NetworkRepository,
 	subnetRepository SubnetRepository,
