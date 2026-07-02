@@ -72,3 +72,26 @@ func (s *ActionSuite) TestStopAndStartServer() {
 	s.Require().NoError(err)
 	s.Assert().Equal("ACTIVE", started.Status)
 }
+
+func (s *ActionSuite) TestRebootServer() {
+	created := s.service.CreateServer(appcompute.CreateServer{
+		Name:     "web",
+		ImageID:  "img-1",
+		FlavorID: "1",
+	})
+	client := testhelper.ServiceClient(s.server.URL + "/demo")
+
+	err := servers.Reboot(
+		s.T().Context(),
+		client,
+		created.ID,
+		servers.RebootOpts{Type: servers.SoftReboot},
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	rebooted, err := s.service.GetServer(created.ID)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("ACTIVE", rebooted.Status)
+	s.Assert().Equal(100, rebooted.Progress)
+}
