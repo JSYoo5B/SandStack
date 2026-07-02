@@ -37,6 +37,7 @@ type imageDocument struct {
 	Protected       bool     `json:"protected"`
 	Visibility      string   `json:"visibility"`
 	Tags            []string `json:"tags"`
+	SizeBytes       int64    `json:"size"`
 	CreatedAt       string   `json:"created_at"`
 	UpdatedAt       string   `json:"updated_at"`
 	File            string   `json:"file"`
@@ -64,6 +65,7 @@ func toImageDocument(image appimage.Image) imageDocument {
 		Protected:       image.Protected,
 		Visibility:      image.Visibility,
 		Tags:            image.Tags,
+		SizeBytes:       image.SizeBytes,
 		CreatedAt:       image.CreatedAt,
 		UpdatedAt:       image.UpdatedAt,
 		File:            "/v2/images/" + image.ID + "/file",

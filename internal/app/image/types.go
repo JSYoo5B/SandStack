@@ -20,6 +20,7 @@ type Image struct {
 	Protected       bool
 	Visibility      string
 	Tags            []string
+	SizeBytes       int64
 	CreatedAt       string
 	UpdatedAt       string
 }

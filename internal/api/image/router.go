@@ -32,6 +32,7 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appimage.NewServiceWithRuntime(
 			storeimage.NewMemoryRepository(),
+			storeimage.NewMemoryDataRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -56,6 +57,8 @@ func (h Handler) Router() http.Handler {
 	router.Get("/images/{image_id}", h.getImage)
 	router.Patch("/images/{image_id}", h.updateImage)
 	router.Delete("/images/{image_id}", h.deleteImage)
+	router.Put("/images/{image_id}/file", h.uploadImageData)
+	router.Get("/images/{image_id}/file", h.downloadImageData)
 
 	return router
 }
