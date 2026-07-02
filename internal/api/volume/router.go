@@ -32,6 +32,7 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appvolume.NewServiceWithRuntime(
 			storevolume.NewMemoryRepository(),
+			storevolume.NewMemorySnapshotRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -57,6 +58,11 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)
 	router.Put("/{project_id}/volumes/{volume_id}", h.updateVolume)
 	router.Delete("/{project_id}/volumes/{volume_id}", h.deleteVolume)
+	router.Get("/{project_id}/snapshots", h.listSnapshots)
+	router.Get("/{project_id}/snapshots/detail", h.listSnapshots)
+	router.Post("/{project_id}/snapshots", h.createSnapshot)
+	router.Get("/{project_id}/snapshots/{snapshot_id}", h.getSnapshot)
+	router.Delete("/{project_id}/snapshots/{snapshot_id}", h.deleteSnapshot)
 	router.Get("/{project_id}/types", h.listVolumeTypes)
 	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)
 

@@ -70,6 +70,7 @@ func NewRouter(cfg config.Config) http.Handler {
 	)
 	volumeService := appvolume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
+		storevolume.NewMemorySnapshotRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)
