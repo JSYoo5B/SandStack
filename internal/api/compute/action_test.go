@@ -30,6 +30,7 @@ func (s *ActionSuite) SetupTest() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)

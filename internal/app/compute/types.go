@@ -107,6 +107,24 @@ type Hypervisor struct {
 	VCPUsUsed          int
 }
 
+type CreateAggregate struct {
+	Name             string
+	AvailabilityZone string
+}
+
+type Aggregate struct {
+	ID               int
+	Name             string
+	AvailabilityZone string
+	Hosts            []string
+	Metadata         map[string]string
+	CreatedAt        string
+	UpdatedAt        string
+	DeletedAt        string
+	Deleted          bool
+	UUID             string
+}
+
 type Limits struct {
 	MaxTotalCores           int
 	MaxImageMeta            int
