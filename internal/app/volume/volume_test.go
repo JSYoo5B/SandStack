@@ -26,6 +26,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 		storevolume.NewMemorySnapshotRepository(),
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -45,6 +46,7 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 		storevolume.NewMemorySnapshotRepository(),
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -64,6 +66,7 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 		storevolume.NewMemorySnapshotRepository(),
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("volume-id"),
 	)
@@ -86,6 +89,7 @@ func (s *VolumeSuite) TestResetClearsVolumes() {
 		storevolume.NewMemorySnapshotRepository(),
 		storevolume.NewMemoryTransferRepository(),
 		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -105,6 +109,10 @@ func (s *VolumeSuite) TestResetClearsVolumes() {
 		Name:     "database-backup",
 		VolumeID: "vol-volume-id",
 	})
+	service.CreateAttachment(volume.CreateAttachment{
+		VolumeID:   "vol-volume-id",
+		InstanceID: "server-id",
+	})
 
 	service.Reset()
 
@@ -112,4 +120,5 @@ func (s *VolumeSuite) TestResetClearsVolumes() {
 	s.Assert().Empty(service.ListSnapshots())
 	s.Assert().Empty(service.ListTransfers())
 	s.Assert().Empty(service.ListBackups())
+	s.Assert().Empty(service.ListAttachments())
 }

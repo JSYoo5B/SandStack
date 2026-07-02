@@ -6,13 +6,14 @@ import (
 )
 
 type Service struct {
-	repository         Repository
-	snapshotRepository SnapshotRepository
-	transferRepository TransferRepository
-	backupRepository   BackupRepository
-	volumeTypes        []VolumeType
-	clock              clock.Clock
-	idGen              idgen.Generator
+	repository           Repository
+	snapshotRepository   SnapshotRepository
+	transferRepository   TransferRepository
+	backupRepository     BackupRepository
+	attachmentRepository AttachmentRepository
+	volumeTypes          []VolumeType
+	clock                clock.Clock
+	idGen                idgen.Generator
 }
 
 func NewServiceWithRuntime(
@@ -20,14 +21,16 @@ func NewServiceWithRuntime(
 	snapshotRepository SnapshotRepository,
 	transferRepository TransferRepository,
 	backupRepository BackupRepository,
+	attachmentRepository AttachmentRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
-		repository:         repository,
-		snapshotRepository: snapshotRepository,
-		transferRepository: transferRepository,
-		backupRepository:   backupRepository,
+		repository:           repository,
+		snapshotRepository:   snapshotRepository,
+		transferRepository:   transferRepository,
+		backupRepository:     backupRepository,
+		attachmentRepository: attachmentRepository,
 		volumeTypes: []VolumeType{
 			{
 				ID:          "default",
@@ -47,4 +50,5 @@ func (s *Service) Reset() {
 	s.snapshotRepository.Reset()
 	s.transferRepository.Reset()
 	s.backupRepository.Reset()
+	s.attachmentRepository.Reset()
 }

@@ -100,3 +100,26 @@ type CreateBackup struct {
 	SnapshotID       string
 	AvailabilityZone string
 }
+
+type Attachment struct {
+	ID             string
+	VolumeID       string
+	Instance       string
+	AttachedAt     string
+	DetachedAt     string
+	Status         string
+	AttachMode     string
+	ConnectionInfo map[string]any
+	Connector      map[string]any
+}
+
+type CreateAttachment struct {
+	VolumeID   string
+	InstanceID string
+	Connector  map[string]any
+	Mode       string
+}
+
+type UpdateAttachment struct {
+	Connector map[string]any
+}
