@@ -25,26 +25,30 @@ type Service struct {
 	idGen                      idgen.Generator
 }
 
+type Repositories struct {
+	ResourceProviders ResourceProviderRepository
+	Inventories       InventoryRepository
+	ProviderTraits    TraitRepository
+	Aggregates        AggregateRepository
+	Usages            UsageRepository
+	Allocations       AllocationRepository
+	ResourceClasses   ResourceClassRepository
+	TraitCatalog      TraitCatalogRepository
+}
+
 func NewServiceWithRepositories(
-	resourceProviderRepository ResourceProviderRepository,
-	inventoryRepository InventoryRepository,
-	traitRepository TraitRepository,
-	aggregateRepository AggregateRepository,
-	usageRepository UsageRepository,
-	allocationRepository AllocationRepository,
-	resourceClassRepository ResourceClassRepository,
-	traitCatalogRepository TraitCatalogRepository,
+	repositories Repositories,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
-		resourceProviderRepository: resourceProviderRepository,
-		inventoryRepository:        inventoryRepository,
-		traitRepository:            traitRepository,
-		aggregateRepository:        aggregateRepository,
-		usageRepository:            usageRepository,
-		allocationRepository:       allocationRepository,
-		resourceClassRepository:    resourceClassRepository,
-		traitCatalogRepository:     traitCatalogRepository,
+		resourceProviderRepository: repositories.ResourceProviders,
+		inventoryRepository:        repositories.Inventories,
+		traitRepository:            repositories.ProviderTraits,
+		aggregateRepository:        repositories.Aggregates,
+		usageRepository:            repositories.Usages,
+		allocationRepository:       repositories.Allocations,
+		resourceClassRepository:    repositories.ResourceClasses,
+		traitCatalogRepository:     repositories.TraitCatalog,
 		idGen:                      idGen,
 	}
 }
