@@ -84,14 +84,16 @@ func NewRouter(cfg config.Config) http.Handler {
 		idgen.Random(),
 	)
 	placementService := appplacement.NewServiceWithRepositories(
-		storeplacement.NewMemoryResourceProviderRepository(),
-		storeplacement.NewMemoryInventoryRepository(),
-		storeplacement.NewMemoryTraitRepository(),
-		storeplacement.NewMemoryAggregateRepository(),
-		storeplacement.NewMemoryUsageRepository(),
-		storeplacement.NewMemoryAllocationRepository(),
-		storeplacement.NewMemoryResourceClassRepository(),
-		storeplacement.NewMemoryTraitCatalogRepository(),
+		appplacement.Repositories{
+			ResourceProviders: storeplacement.NewMemoryResourceProviderRepository(),
+			Inventories:       storeplacement.NewMemoryInventoryRepository(),
+			ProviderTraits:    storeplacement.NewMemoryTraitRepository(),
+			Aggregates:        storeplacement.NewMemoryAggregateRepository(),
+			Usages:            storeplacement.NewMemoryUsageRepository(),
+			Allocations:       storeplacement.NewMemoryAllocationRepository(),
+			ResourceClasses:   storeplacement.NewMemoryResourceClassRepository(),
+			TraitCatalog:      storeplacement.NewMemoryTraitCatalogRepository(),
+		},
 		idgen.Random(),
 	)
 
