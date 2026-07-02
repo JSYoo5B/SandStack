@@ -16,3 +16,11 @@ type SubnetRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type PortRepository interface {
+	Create(port Port) Port
+	List() []Port
+	Get(id string) (Port, error)
+	Delete(id string) error
+	Reset()
+}
