@@ -3,10 +3,10 @@ package identity
 import "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/roles"
 
 func (s Service) Roles() []roles.Role {
-	return []roles.Role{s.Role()}
+	return s.repositories.Roles.List()
 }
 
-func (s Service) Role() roles.Role {
+func (s Service) defaultRole() roles.Role {
 	return roles.Role{
 		DomainID:    "default",
 		ID:          s.config.RoleName,
@@ -19,8 +19,8 @@ func (s Service) Role() roles.Role {
 }
 
 func (s Service) RoleByID(id string) (roles.Role, bool) {
-	role := s.Role()
-	if role.ID != id {
+	role, err := s.repositories.Roles.Get(id)
+	if err != nil {
 		return roles.Role{}, false
 	}
 

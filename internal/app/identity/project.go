@@ -3,10 +3,10 @@ package identity
 import "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/projects"
 
 func (s Service) Projects() []projects.Project {
-	return []projects.Project{s.Project()}
+	return s.repositories.Projects.List()
 }
 
-func (s Service) Project() projects.Project {
+func (s Service) defaultProject() projects.Project {
 	return projects.Project{
 		ID:          s.config.ProjectID,
 		Name:        s.config.ProjectName,
@@ -20,8 +20,8 @@ func (s Service) Project() projects.Project {
 }
 
 func (s Service) ProjectByID(id string) (projects.Project, bool) {
-	project := s.Project()
-	if project.ID != id {
+	project, err := s.repositories.Projects.Get(id)
+	if err != nil {
 		return projects.Project{}, false
 	}
 

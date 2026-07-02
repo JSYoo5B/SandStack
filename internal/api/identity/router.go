@@ -6,6 +6,7 @@ import (
 
 	appidentity "github.com/JSYoo5B/SandStack/internal/app/identity"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	storeidentity "github.com/JSYoo5B/SandStack/internal/store/identity"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -19,8 +20,25 @@ func NewRouter(cfg config.Config) http.Handler {
 }
 
 func NewHandler(cfg config.Config) Handler {
+	return NewHandlerWithService(
+		cfg,
+		appidentity.NewServiceWithRepositories(
+			cfg,
+			appidentity.Repositories{
+				Users:    storeidentity.NewMemoryUserRepository(),
+				Projects: storeidentity.NewMemoryProjectRepository(),
+				Roles:    storeidentity.NewMemoryRoleRepository(),
+			},
+		),
+	)
+}
+
+func NewHandlerWithService(
+	cfg config.Config,
+	service appidentity.Service,
+) Handler {
 	return Handler{
-		service: appidentity.NewService(cfg),
+		service: service,
 		config:  cfg,
 	}
 }

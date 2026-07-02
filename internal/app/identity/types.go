@@ -2,6 +2,16 @@ package identity
 
 import "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 
+type User struct {
+	DefaultProjectID string
+	Description      string
+	DomainID         string
+	Enabled          bool
+	ID               string
+	Name             string
+	Password         string
+}
+
 type PasswordAuth struct {
 	Username    string
 	Password    string

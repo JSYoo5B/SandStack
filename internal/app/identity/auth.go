@@ -5,40 +5,55 @@ import (
 	"time"
 
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/roles"
 	"github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 )
 
 var ErrInvalidCredentials = errors.New("invalid identity credentials")
 
 func (s Service) AuthenticatePassword(auth PasswordAuth, baseURL string) (IssuedToken, error) {
-	if auth.Username != s.config.Username || auth.Password != s.config.Password || auth.ProjectName != s.config.ProjectName {
+	user, err := s.repositories.Users.FindByName(auth.Username)
+	if err != nil || user.Password != auth.Password {
+		return IssuedToken{}, ErrInvalidCredentials
+	}
+
+	project, err := s.repositories.Projects.FindByName(auth.ProjectName)
+	if err != nil {
 		return IssuedToken{}, ErrInvalidCredentials
 	}
 
 	now := time.Now().UTC()
+	roles := s.repositories.Roles.List()
 	return IssuedToken{
 		ID:        "sandstack-" + idgen.RandomHex(16),
 		ExpiresAt: now.Add(24 * time.Hour).Format(time.RFC3339),
 		IssuedAt:  now.Format(time.RFC3339),
 		Methods:   []string{"password"},
 		User: tokens.User{
-			ID:     s.config.UserID,
-			Name:   s.config.Username,
+			ID:     user.ID,
+			Name:   user.Name,
 			Domain: defaultDomain(),
 		},
 		Project: tokens.Project{
-			ID:     s.config.ProjectID,
-			Name:   s.config.ProjectName,
+			ID:     project.ID,
+			Name:   project.Name,
 			Domain: defaultDomain(),
 		},
-		Roles: []tokens.Role{
-			{
-				ID:   s.config.RoleName,
-				Name: s.config.RoleName,
-			},
-		},
+		Roles:   tokenRoles(roles),
 		Catalog: s.Catalog(baseURL),
 	}, nil
+}
+
+func tokenRoles(roles []roles.Role) []tokens.Role {
+	result := make([]tokens.Role, 0, len(roles))
+	for _, role := range roles {
+		result = append(result, tokens.Role{
+			ID:   role.ID,
+			Name: role.Name,
+		})
+	}
+
+	return result
 }
 
 func defaultDomain() tokens.Domain {
