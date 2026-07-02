@@ -84,6 +84,11 @@ func (h Handler) Router() http.Handler {
 	router.Post("/{project_id}/attachments/{attachment_id}/action", h.actionAttachment)
 	router.Get("/{project_id}/types", h.listVolumeTypes)
 	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)
+	router.Get("/{project_id}/types/{type_id}/extra_specs", h.listExtraSpecs)
+	router.Post("/{project_id}/types/{type_id}/extra_specs", h.createExtraSpecs)
+	router.Get("/{project_id}/types/{type_id}/extra_specs/{key}", h.getExtraSpec)
+	router.Put("/{project_id}/types/{type_id}/extra_specs/{key}", h.updateExtraSpec)
+	router.Delete("/{project_id}/types/{type_id}/extra_specs/{key}", h.deleteExtraSpec)
 
 	return router
 }
