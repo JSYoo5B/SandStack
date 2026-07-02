@@ -12,26 +12,7 @@ type Service struct {
 	idGen            idgen.Generator
 }
 
-func NewService() *Service {
-	return NewServiceWithRuntime(clock.Wall(), idgen.Random())
-}
-
-func NewServiceWithClock(clock clock.Clock) *Service {
-	return NewServiceWithRuntime(clock, idgen.Random())
-}
-
 func NewServiceWithRuntime(
-	clock clock.Clock,
-	idGen idgen.Generator,
-) *Service {
-	return NewServiceWithRepository(
-		NewMemoryServerRepository(),
-		clock,
-		idGen,
-	)
-}
-
-func NewServiceWithRepository(
 	serverRepository ServerRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,

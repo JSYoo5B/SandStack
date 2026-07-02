@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
 	_ "modernc.org/sqlite"
 )
 
@@ -54,7 +55,7 @@ func (r *SQLiteServerRepository) Close() error {
 	return r.db.Close()
 }
 
-func (r *SQLiteServerRepository) Create(server Server) Server {
+func (r *SQLiteServerRepository) Create(server appcompute.Server) appcompute.Server {
 	metadataJSON := marshalStringMap(server.Metadata)
 
 	_, err := r.db.Exec(
@@ -90,7 +91,7 @@ func (r *SQLiteServerRepository) Create(server Server) Server {
 	return server
 }
 
-func (r *SQLiteServerRepository) List() []Server {
+func (r *SQLiteServerRepository) List() []appcompute.Server {
 	rows, err := r.db.Query(`
 SELECT
 	id,
@@ -111,7 +112,7 @@ ORDER BY sequence`)
 	}
 	defer rows.Close()
 
-	servers := []Server{}
+	servers := []appcompute.Server{}
 	for rows.Next() {
 		server, err := scanServer(rows)
 		if err != nil {
@@ -126,7 +127,7 @@ ORDER BY sequence`)
 	return servers
 }
 
-func (r *SQLiteServerRepository) Get(id string) (Server, error) {
+func (r *SQLiteServerRepository) Get(id string) (appcompute.Server, error) {
 	row := r.db.QueryRow(`
 SELECT
 	id,
@@ -145,16 +146,16 @@ WHERE id = ?`, id)
 
 	server, err := scanServer(row)
 	if errors.Is(err, sql.ErrNoRows) {
-		return Server{}, ErrServerNotFound
+		return appcompute.Server{}, appcompute.ErrServerNotFound
 	}
 	if err != nil {
-		return Server{}, err
+		return appcompute.Server{}, err
 	}
 
 	return server, nil
 }
 
-func (r *SQLiteServerRepository) Update(server Server) (Server, error) {
+func (r *SQLiteServerRepository) Update(server appcompute.Server) (appcompute.Server, error) {
 	metadataJSON := marshalStringMap(server.Metadata)
 	result, err := r.db.Exec(
 		`UPDATE compute_servers
@@ -182,15 +183,15 @@ func (r *SQLiteServerRepository) Update(server Server) (Server, error) {
 		server.ID,
 	)
 	if err != nil {
-		return Server{}, err
+		return appcompute.Server{}, err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return Server{}, err
+		return appcompute.Server{}, err
 	}
 	if rowsAffected == 0 {
-		return Server{}, ErrServerNotFound
+		return appcompute.Server{}, appcompute.ErrServerNotFound
 	}
 
 	return server, nil
@@ -207,7 +208,7 @@ func (r *SQLiteServerRepository) Delete(id string) error {
 		return err
 	}
 	if rowsAffected == 0 {
-		return ErrServerNotFound
+		return appcompute.ErrServerNotFound
 	}
 
 	return nil
@@ -223,8 +224,8 @@ type serverScanner interface {
 	Scan(dest ...any) error
 }
 
-func scanServer(scanner serverScanner) (Server, error) {
-	var server Server
+func scanServer(scanner serverScanner) (appcompute.Server, error) {
+	var server appcompute.Server
 	var metadataJSON string
 
 	if err := scanner.Scan(
@@ -240,11 +241,11 @@ func scanServer(scanner serverScanner) (Server, error) {
 		&server.UpdatedAt,
 		&metadataJSON,
 	); err != nil {
-		return Server{}, err
+		return appcompute.Server{}, err
 	}
 
 	if err := json.Unmarshal([]byte(metadataJSON), &server.Metadata); err != nil {
-		return Server{}, err
+		return appcompute.Server{}, err
 	}
 
 	return server, nil

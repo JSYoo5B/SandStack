@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	appcompute "github.com/JSYoo5B/SandStack/internal/app/compute"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,7 +28,14 @@ func NewRouterWithService(
 }
 
 func NewHandler(cfg config.Config) Handler {
-	return NewHandlerWithService(cfg, appcompute.NewService())
+	return NewHandlerWithService(
+		cfg,
+		appcompute.NewServiceWithRuntime(
+			storecompute.NewMemoryServerRepository(),
+			clock.Wall(),
+			idgen.Random(),
+		),
+	)
 }
 
 func NewHandlerWithService(
