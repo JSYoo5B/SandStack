@@ -24,3 +24,10 @@ type TraitRepository interface {
 	Delete(resourceProviderUUID string)
 	Reset()
 }
+
+type AggregateRepository interface {
+	Set(resourceProviderUUID string, aggregates []string)
+	Get(resourceProviderUUID string) []string
+	Delete(resourceProviderUUID string)
+	Reset()
+}
