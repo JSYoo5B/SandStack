@@ -136,3 +136,45 @@ type CreateSecurityGroupRule struct {
 	SecurityGroupID      string
 	ProjectID            string
 }
+
+type Router struct {
+	ID                    string
+	Name                  string
+	Description           string
+	AdminStateUp          bool
+	Distributed           bool
+	Status                string
+	TenantID              string
+	ProjectID             string
+	GatewayInfo           RouterGatewayInfo
+	Routes                []Route
+	AvailabilityZoneHints []string
+	Tags                  []string
+}
+
+type CreateRouter struct {
+	Name                  string
+	Description           string
+	AdminStateUp          *bool
+	Distributed           *bool
+	ProjectID             string
+	GatewayInfo           RouterGatewayInfo
+	AvailabilityZoneHints []string
+}
+
+type RouterGatewayInfo struct {
+	NetworkID        string
+	EnableSNAT       *bool
+	ExternalFixedIPs []ExternalFixedIP
+	QoSPolicyID      string
+}
+
+type ExternalFixedIP struct {
+	IPAddress string
+	SubnetID  string
+}
+
+type Route struct {
+	NextHop         string
+	DestinationCIDR string
+}

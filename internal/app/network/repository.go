@@ -40,3 +40,11 @@ type SecurityGroupRuleRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type RouterRepository interface {
+	Create(router Router) Router
+	List() []Router
+	Get(id string) (Router, error)
+	Delete(id string) error
+	Reset()
+}

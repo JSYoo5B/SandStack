@@ -63,6 +63,7 @@ func NewRouter(cfg config.Config) http.Handler {
 		storenetwork.NewMemoryPortRepository(),
 		storenetwork.NewMemorySecurityGroupRepository(),
 		storenetwork.NewMemorySecurityGroupRuleRepository(),
+		storenetwork.NewMemoryRouterRepository(),
 		idgen.Random(),
 	)
 	volumeService := appvolume.NewServiceWithRuntime(
