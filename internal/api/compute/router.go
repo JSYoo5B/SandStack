@@ -34,6 +34,7 @@ func NewHandler(cfg config.Config) Handler {
 			storecompute.NewMemoryServerRepository(),
 			storecompute.NewMemoryKeyPairRepository(),
 			storecompute.NewMemoryServerGroupRepository(),
+			storecompute.NewMemoryAggregateRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -61,6 +62,10 @@ func (h Handler) Router() http.Handler {
 	router.Get("/{project_id}/os-hypervisors/detail", h.listHypervisors)
 	router.Get("/{project_id}/os-hypervisors/statistics", h.getHypervisorStatistics)
 	router.Get("/{project_id}/os-hypervisors/{hypervisor_id}", h.getHypervisor)
+	router.Get("/{project_id}/os-aggregates", h.listAggregates)
+	router.Post("/{project_id}/os-aggregates", h.createAggregate)
+	router.Get("/{project_id}/os-aggregates/{aggregate_id}", h.getAggregate)
+	router.Delete("/{project_id}/os-aggregates/{aggregate_id}", h.deleteAggregate)
 	router.Get("/{project_id}/flavors", h.listFlavors)
 	router.Get("/{project_id}/flavors/detail", h.listFlavors)
 	router.Get("/{project_id}/flavors/{flavor_id}", h.getFlavor)

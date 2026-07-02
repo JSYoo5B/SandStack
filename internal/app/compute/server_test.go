@@ -25,6 +25,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedClock() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -44,6 +45,7 @@ func (s *ServerSuite) TestCreateServerUsesInjectedIDGenerator() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)
@@ -63,6 +65,7 @@ func (s *ServerSuite) TestGetServerActivatesCreatedServer() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("server-id"),
 	)
@@ -86,6 +89,7 @@ func (s *ServerSuite) TestResetClearsServers() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("server-id"),
 	)

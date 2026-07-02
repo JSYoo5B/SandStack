@@ -29,6 +29,7 @@ func (s *MetadataSuite) SetupTest() {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)

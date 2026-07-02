@@ -24,3 +24,11 @@ type ServerGroupRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type AggregateRepository interface {
+	Create(aggregate Aggregate) Aggregate
+	List() []Aggregate
+	Get(id int) (Aggregate, error)
+	Delete(id int) error
+	Reset()
+}

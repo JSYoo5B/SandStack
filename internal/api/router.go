@@ -48,6 +48,7 @@ func NewRouter(cfg config.Config) http.Handler {
 		storecompute.NewMemoryServerRepository(),
 		storecompute.NewMemoryKeyPairRepository(),
 		storecompute.NewMemoryServerGroupRepository(),
+		storecompute.NewMemoryAggregateRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)
