@@ -1,19 +1,15 @@
 package compute
 
 import (
-	"sync"
-
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 )
 
 type Service struct {
-	flavors []Flavor
-	mu      sync.RWMutex
-	ids     []string
-	servers map[string]Server
-	clock   clock.Clock
-	idGen   idgen.Generator
+	flavors          []Flavor
+	serverRepository ServerRepository
+	clock            clock.Clock
+	idGen            idgen.Generator
 }
 
 func NewService() *Service {
@@ -25,6 +21,18 @@ func NewServiceWithClock(clock clock.Clock) *Service {
 }
 
 func NewServiceWithRuntime(
+	clock clock.Clock,
+	idGen idgen.Generator,
+) *Service {
+	return NewServiceWithRepository(
+		NewMemoryServerRepository(),
+		clock,
+		idGen,
+	)
+}
+
+func NewServiceWithRepository(
+	serverRepository ServerRepository,
 	clock clock.Clock,
 	idGen idgen.Generator,
 ) *Service {
@@ -44,17 +52,12 @@ func NewServiceWithRuntime(
 				ExtraSpecs:  map[string]string{},
 			},
 		},
-		ids:     []string{},
-		servers: map[string]Server{},
-		clock:   clock,
-		idGen:   idGen,
+		serverRepository: serverRepository,
+		clock:            clock,
+		idGen:            idGen,
 	}
 }
 
 func (s *Service) Reset() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ids = []string{}
-	s.servers = map[string]Server{}
+	s.serverRepository.Reset()
 }
