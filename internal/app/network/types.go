@@ -178,3 +178,27 @@ type Route struct {
 	NextHop         string
 	DestinationCIDR string
 }
+
+type FloatingIP struct {
+	ID                string
+	Description       string
+	FloatingNetworkID string
+	FloatingIP        string
+	PortID            string
+	FixedIP           string
+	TenantID          string
+	ProjectID         string
+	Status            string
+	RouterID          string
+	Tags              []string
+}
+
+type CreateFloatingIP struct {
+	Description       string
+	FloatingNetworkID string
+	FloatingIP        string
+	PortID            string
+	FixedIP           string
+	SubnetID          string
+	ProjectID         string
+}

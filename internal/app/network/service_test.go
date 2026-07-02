@@ -98,6 +98,20 @@ func (s *ServiceSuite) TestCreateRouterUsesInjectedIDGenerator() {
 	s.Assert().True(created.AdminStateUp)
 }
 
+func (s *ServiceSuite) TestCreateFloatingIPUsesInjectedIDGenerator() {
+	service := newService(idgen.Fixed("floating-ip-id"))
+
+	created := service.CreateFloatingIP(network.CreateFloatingIP{
+		FloatingNetworkID: "public",
+		ProjectID:         "demo",
+	})
+
+	s.Assert().Equal("fip-floating-ip-id", created.ID)
+	s.Assert().Equal("public", created.FloatingNetworkID)
+	s.Assert().Equal("203.0.113.10", created.FloatingIP)
+	s.Assert().Equal("DOWN", created.Status)
+}
+
 func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	service := newService(idgen.Fixed("network-id"))
 	created := service.Create(network.CreateNetwork{Name: "private"})
@@ -113,6 +127,9 @@ func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	})
 	s.Require().NoError(err)
 	service.CreateRouter(network.CreateRouter{Name: "edge"})
+	service.CreateFloatingIP(network.CreateFloatingIP{
+		FloatingNetworkID: created.ID,
+	})
 
 	service.Reset()
 
@@ -122,6 +139,7 @@ func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	s.Assert().Empty(service.ListSecurityGroups())
 	s.Assert().Empty(service.ListSecurityGroupRules())
 	s.Assert().Empty(service.ListRouters())
+	s.Assert().Empty(service.ListFloatingIPs())
 }
 
 func newService(idGen idgen.Generator) *network.Service {
@@ -132,6 +150,7 @@ func newService(idGen idgen.Generator) *network.Service {
 		storenetwork.NewMemorySecurityGroupRepository(),
 		storenetwork.NewMemorySecurityGroupRuleRepository(),
 		storenetwork.NewMemoryRouterRepository(),
+		storenetwork.NewMemoryFloatingIPRepository(),
 		idGen,
 	)
 }

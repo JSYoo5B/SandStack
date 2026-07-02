@@ -48,3 +48,11 @@ type RouterRepository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type FloatingIPRepository interface {
+	Create(floatingIP FloatingIP) FloatingIP
+	List() []FloatingIP
+	Get(id string) (FloatingIP, error)
+	Delete(id string) error
+	Reset()
+}
