@@ -9,8 +9,7 @@ import (
 type Service struct {
 	mu                sync.RWMutex
 	networkRepository NetworkRepository
-	subnetIDs         []string
-	subnets           map[string]Subnet
+	subnetRepository  SubnetRepository
 	portIDs           []string
 	ports             map[string]Port
 	idGen             idgen.Generator
@@ -23,18 +22,19 @@ func NewService() *Service {
 func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
 	return NewServiceWithRepositories(
 		NewMemoryNetworkRepository(),
+		NewMemorySubnetRepository(),
 		idGen,
 	)
 }
 
 func NewServiceWithRepositories(
 	networkRepository NetworkRepository,
+	subnetRepository SubnetRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
 		networkRepository: networkRepository,
-		subnetIDs:         []string{},
-		subnets:           map[string]Subnet{},
+		subnetRepository:  subnetRepository,
 		portIDs:           []string{},
 		ports:             map[string]Port{},
 		idGen:             idGen,
@@ -46,8 +46,7 @@ func (s *Service) Reset() {
 	defer s.mu.Unlock()
 
 	s.networkRepository.Reset()
-	s.subnetIDs = []string{}
-	s.subnets = map[string]Subnet{}
+	s.subnetRepository.Reset()
 	s.portIDs = []string{}
 	s.ports = map[string]Port{}
 }
