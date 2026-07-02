@@ -50,3 +50,8 @@ type CreateKeyPair struct {
 	Type      string
 	PublicKey string
 }
+
+type ServerAddress struct {
+	Version int
+	Address string
+}
