@@ -60,12 +60,45 @@ func (s *ServiceSuite) TestCreateSecurityGroupUsesInjectedIDGenerator() {
 	s.Assert().True(created.Stateful)
 }
 
+func (s *ServiceSuite) TestCreateSecurityGroupRuleUsesInjectedIDGenerator() {
+	service := newService(idgen.Fixed("security-group-rule-id"))
+	securityGroup := service.CreateSecurityGroup(network.CreateSecurityGroup{
+		Name:      "web",
+		ProjectID: "demo",
+	})
+
+	created, err := service.CreateSecurityGroupRule(
+		network.CreateSecurityGroupRule{
+			Direction:       "ingress",
+			EtherType:       "IPv4",
+			Protocol:        "tcp",
+			PortRangeMin:    80,
+			PortRangeMax:    80,
+			RemoteIPPrefix:  "0.0.0.0/0",
+			SecurityGroupID: securityGroup.ID,
+		},
+	)
+	s.Require().NoError(err)
+
+	s.Assert().Equal("sgr-security-group-rule-id", created.ID)
+	s.Assert().Equal(securityGroup.ID, created.SecurityGroupID)
+	s.Assert().Equal("demo", created.ProjectID)
+}
+
 func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	service := newService(idgen.Fixed("network-id"))
 	created := service.Create(network.CreateNetwork{Name: "private"})
 	service.CreateSubnet(network.CreateSubnet{NetworkID: created.ID})
 	service.CreatePort(network.CreatePort{NetworkID: created.ID})
-	service.CreateSecurityGroup(network.CreateSecurityGroup{Name: "default"})
+	securityGroup := service.CreateSecurityGroup(network.CreateSecurityGroup{
+		Name: "default",
+	})
+	_, err := service.CreateSecurityGroupRule(network.CreateSecurityGroupRule{
+		Direction:       "ingress",
+		EtherType:       "IPv4",
+		SecurityGroupID: securityGroup.ID,
+	})
+	s.Require().NoError(err)
 
 	service.Reset()
 
@@ -73,6 +106,7 @@ func (s *ServiceSuite) TestResetClearsNetworkResources() {
 	s.Assert().Empty(service.ListSubnets())
 	s.Assert().Empty(service.ListPorts())
 	s.Assert().Empty(service.ListSecurityGroups())
+	s.Assert().Empty(service.ListSecurityGroupRules())
 }
 
 func newService(idGen idgen.Generator) *network.Service {
@@ -81,6 +115,7 @@ func newService(idGen idgen.Generator) *network.Service {
 		storenetwork.NewMemorySubnetRepository(),
 		storenetwork.NewMemoryPortRepository(),
 		storenetwork.NewMemorySecurityGroupRepository(),
+		storenetwork.NewMemorySecurityGroupRuleRepository(),
 		idGen,
 	)
 }

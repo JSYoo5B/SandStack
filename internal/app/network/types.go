@@ -108,15 +108,31 @@ type CreateSecurityGroup struct {
 }
 
 type SecurityGroupRule struct {
-	ID              string
-	Direction       string
-	EtherType       string
-	Protocol        string
-	PortRangeMin    int
-	PortRangeMax    int
-	RemoteIPPrefix  string
-	RemoteGroupID   string
-	SecurityGroupID string
-	TenantID        string
-	ProjectID       string
+	ID                   string
+	Direction            string
+	Description          string
+	EtherType            string
+	Protocol             string
+	PortRangeMin         int
+	PortRangeMax         int
+	RemoteAddressGroupID string
+	RemoteIPPrefix       string
+	RemoteGroupID        string
+	SecurityGroupID      string
+	TenantID             string
+	ProjectID            string
+}
+
+type CreateSecurityGroupRule struct {
+	Direction            string
+	Description          string
+	EtherType            string
+	Protocol             string
+	PortRangeMin         int
+	PortRangeMax         int
+	RemoteAddressGroupID string
+	RemoteIPPrefix       string
+	RemoteGroupID        string
+	SecurityGroupID      string
+	ProjectID            string
 }
