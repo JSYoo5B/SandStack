@@ -86,3 +86,50 @@ func (s *MetadataSuite) TestServerMetadataLifecycle() {
 		updated,
 	)
 }
+
+func (s *MetadataSuite) TestServerMetadatumLifecycle() {
+	created := s.service.CreateServer(appcompute.CreateServer{
+		Name:     "web",
+		ImageID:  "img-1",
+		FlavorID: "1",
+		Metadata: map[string]string{
+			"role": "web",
+		},
+	})
+	client := testhelper.ServiceClient(s.server.URL + "/demo")
+
+	initial, err := servers.Metadatum(
+		s.T().Context(),
+		client,
+		created.ID,
+		"role",
+	).Extract()
+	s.Require().NoError(err)
+
+	updated, err := servers.CreateMetadatum(
+		s.T().Context(),
+		client,
+		created.ID,
+		servers.MetadatumOpts{"role": "api"},
+	).Extract()
+	s.Require().NoError(err)
+
+	err = servers.DeleteMetadatum(
+		s.T().Context(),
+		client,
+		created.ID,
+		"role",
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	final, err := servers.Metadata(
+		s.T().Context(),
+		client,
+		created.ID,
+	).Extract()
+	s.Require().NoError(err)
+
+	s.Assert().Equal(map[string]string{"role": "web"}, initial)
+	s.Assert().Equal(map[string]string{"role": "api"}, updated)
+	s.Assert().Empty(final)
+}
