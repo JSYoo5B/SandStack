@@ -6,21 +6,14 @@ import (
 )
 
 func (s Service) Endpoints(baseURL string) []endpoints.Endpoint {
-	catalog := s.Catalog(baseURL)
-	result := []endpoints.Endpoint{}
-	for _, entry := range catalog {
-		for _, endpoint := range entry.Endpoints {
-			result = append(result, endpoints.Endpoint{
-				ID:           endpoint.ID,
-				Availability: gophercloud.Availability(endpoint.Interface),
-				Name:         entry.Name,
-				Region:       endpoint.Region,
-				ServiceID:    entry.ID,
-				URL:          endpoint.URL,
-				Enabled:      true,
-				Description:  "SandStack " + entry.Name + " endpoint",
-			})
+	definitions := s.repositories.Endpoints.List()
+	result := make([]endpoints.Endpoint, 0, len(definitions))
+	for _, endpoint := range definitions {
+		service, err := s.repositories.Services.Get(endpoint.ServiceID)
+		if err != nil {
+			continue
 		}
+		result = append(result, toEndpoint(baseURL, service, endpoint))
 	}
 
 	return result
@@ -30,11 +23,31 @@ func (s Service) EndpointByID(
 	baseURL string,
 	id string,
 ) (endpoints.Endpoint, bool) {
-	for _, endpoint := range s.Endpoints(baseURL) {
-		if endpoint.ID == id {
-			return endpoint, true
-		}
+	endpoint, err := s.repositories.Endpoints.Get(id)
+	if err != nil {
+		return endpoints.Endpoint{}, false
+	}
+	service, err := s.repositories.Services.Get(endpoint.ServiceID)
+	if err != nil {
+		return endpoints.Endpoint{}, false
 	}
 
-	return endpoints.Endpoint{}, false
+	return toEndpoint(baseURL, service, endpoint), true
+}
+
+func toEndpoint(
+	baseURL string,
+	service ServiceDefinition,
+	endpoint EndpointDefinition,
+) endpoints.Endpoint {
+	return endpoints.Endpoint{
+		ID:           endpoint.ID,
+		Availability: gophercloud.Availability(endpoint.Interface),
+		Name:         service.Name,
+		Region:       endpoint.Region,
+		ServiceID:    endpoint.ServiceID,
+		URL:          baseURL + endpoint.Path,
+		Enabled:      endpoint.Enabled,
+		Description:  endpoint.Description,
+	}
 }

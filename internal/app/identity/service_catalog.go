@@ -3,15 +3,15 @@ package identity
 import "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/services"
 
 func (s Service) Services(baseURL string) []services.Service {
-	catalog := s.Catalog(baseURL)
-	result := make([]services.Service, 0, len(catalog))
-	for _, entry := range catalog {
+	definitions := s.repositories.Services.List()
+	result := make([]services.Service, 0, len(definitions))
+	for _, entry := range definitions {
 		result = append(result, services.Service{
 			ID:          entry.ID,
 			Name:        entry.Name,
-			Description: "SandStack " + entry.Name + " service",
+			Description: entry.Description,
 			Type:        entry.Type,
-			Enabled:     true,
+			Enabled:     entry.Enabled,
 			Links:       map[string]any{},
 			Extra:       map[string]any{},
 		})
@@ -21,11 +21,18 @@ func (s Service) Services(baseURL string) []services.Service {
 }
 
 func (s Service) ServiceByID(baseURL, id string) (services.Service, bool) {
-	for _, service := range s.Services(baseURL) {
-		if service.ID == id {
-			return service, true
-		}
+	service, err := s.repositories.Services.Get(id)
+	if err != nil {
+		return services.Service{}, false
 	}
 
-	return services.Service{}, false
+	return services.Service{
+		ID:          service.ID,
+		Name:        service.Name,
+		Description: service.Description,
+		Type:        service.Type,
+		Enabled:     service.Enabled,
+		Links:       map[string]any{},
+		Extra:       map[string]any{},
+	}, true
 }

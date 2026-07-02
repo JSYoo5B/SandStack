@@ -6,10 +6,12 @@ import (
 )
 
 type Repositories struct {
-	Users    UserRepository
-	Projects ProjectRepository
-	Roles    RoleRepository
-	Tokens   TokenRepository
+	Users     UserRepository
+	Projects  ProjectRepository
+	Roles     RoleRepository
+	Tokens    TokenRepository
+	Services  ServiceRepository
+	Endpoints EndpointRepository
 }
 
 type UserRepository interface {
@@ -39,5 +41,20 @@ type TokenRepository interface {
 	Save(token IssuedToken) IssuedToken
 	Get(id string) (IssuedToken, error)
 	Delete(id string) error
+	Reset()
+}
+
+type ServiceRepository interface {
+	Save(service ServiceDefinition) ServiceDefinition
+	List() []ServiceDefinition
+	Get(id string) (ServiceDefinition, error)
+	Reset()
+}
+
+type EndpointRepository interface {
+	Save(endpoint EndpointDefinition) EndpointDefinition
+	List() []EndpointDefinition
+	Get(id string) (EndpointDefinition, error)
+	ListByServiceID(serviceID string) []EndpointDefinition
 	Reset()
 }

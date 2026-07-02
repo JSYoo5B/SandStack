@@ -12,6 +12,24 @@ type User struct {
 	Password         string
 }
 
+type ServiceDefinition struct {
+	ID          string
+	Name        string
+	Type        string
+	Description string
+	Enabled     bool
+}
+
+type EndpointDefinition struct {
+	ID          string
+	ServiceID   string
+	Interface   string
+	Region      string
+	Path        string
+	Enabled     bool
+	Description string
+}
+
 type PasswordAuth struct {
 	Username    string
 	Password    string
