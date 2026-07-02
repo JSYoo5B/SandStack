@@ -28,6 +28,7 @@ func NewHandler(cfg config.Config) Handler {
 				Users:    storeidentity.NewMemoryUserRepository(),
 				Projects: storeidentity.NewMemoryProjectRepository(),
 				Roles:    storeidentity.NewMemoryRoleRepository(),
+				Tokens:   storeidentity.NewMemoryTokenRepository(),
 			},
 		),
 	)
@@ -51,6 +52,9 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/", h.version)
 	router.Post("/auth/tokens", h.createToken)
+	router.Get("/auth/tokens", h.getToken)
+	router.Head("/auth/tokens", h.validateToken)
+	router.Delete("/auth/tokens", h.revokeToken)
 	router.Get("/projects", h.listProjects)
 	router.Get("/projects/{project_id}", h.getProject)
 	router.Get("/users", h.listUsers)
