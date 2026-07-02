@@ -3,25 +3,62 @@ package placement
 import (
 	"net/http"
 
+	appplacement "github.com/JSYoo5B/SandStack/internal/app/placement"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storeplacement "github.com/JSYoo5B/SandStack/internal/store/placement"
 	"github.com/go-chi/chi/v5"
 )
 
 type Handler struct {
-	config config.Config
+	config  config.Config
+	service *appplacement.Service
 }
 
 func NewRouter(cfg config.Config) http.Handler {
 	return NewHandler(cfg).Router()
 }
 
+func NewRouterWithService(
+	cfg config.Config,
+	service *appplacement.Service,
+) http.Handler {
+	return NewHandlerWithService(cfg, service).Router()
+}
+
 func NewHandler(cfg config.Config) Handler {
-	return Handler{config: cfg}
+	return NewHandlerWithService(
+		cfg,
+		appplacement.NewServiceWithRepositories(
+			storeplacement.NewMemoryResourceProviderRepository(),
+			idgen.Random(),
+		),
+	)
+}
+
+func NewHandlerWithService(
+	cfg config.Config,
+	service *appplacement.Service,
+) Handler {
+	return Handler{
+		config:  cfg,
+		service: service,
+	}
 }
 
 func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/", h.versions)
+	router.Get("/resource_providers", h.listResourceProviders)
+	router.Post("/resource_providers", h.createResourceProvider)
+	router.Get(
+		"/resource_providers/{resource_provider_uuid}",
+		h.getResourceProvider,
+	)
+	router.Delete(
+		"/resource_providers/{resource_provider_uuid}",
+		h.deleteResourceProvider,
+	)
 
 	return router
 }
