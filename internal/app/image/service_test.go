@@ -7,6 +7,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/app/image"
 	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -20,7 +21,11 @@ func TestServiceSuite(t *testing.T) {
 
 func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 0, time.UTC)
-	service := image.NewServiceWithClock(clock.Fixed(now))
+	service := image.NewServiceWithRuntime(
+		storeimage.NewMemoryRepository(),
+		clock.Fixed(now),
+		idgen.Random(),
+	)
 
 	created := service.Create(image.CreateImage{
 		Name:            "ubuntu",
@@ -34,6 +39,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedClock() {
 
 func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 	service := image.NewServiceWithRuntime(
+		storeimage.NewMemoryRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)
@@ -49,6 +55,7 @@ func (s *ServiceSuite) TestCreateImageUsesInjectedIDGenerator() {
 
 func (s *ServiceSuite) TestResetClearsImages() {
 	service := image.NewServiceWithRuntime(
+		storeimage.NewMemoryRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("image-id"),
 	)

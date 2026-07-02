@@ -15,7 +15,10 @@ import (
 	appnetwork "github.com/JSYoo5B/SandStack/internal/app/network"
 	"github.com/JSYoo5B/SandStack/internal/app/requestlog"
 	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
+	"github.com/JSYoo5B/SandStack/internal/platform/clock"
 	"github.com/JSYoo5B/SandStack/internal/platform/config"
+	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
+	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -26,7 +29,11 @@ func NewRouter(cfg config.Config) http.Handler {
 	router.Use(recordRequests(requests))
 	identityHandler := identity.NewHandler(cfg)
 	computeService := appcompute.NewService()
-	imageService := appimage.NewService()
+	imageService := appimage.NewServiceWithRuntime(
+		storeimage.NewMemoryRepository(),
+		clock.Wall(),
+		idgen.Random(),
+	)
 	networkService := appnetwork.NewService()
 	volumeService := appvolume.NewService()
 
