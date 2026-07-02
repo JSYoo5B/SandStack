@@ -10,6 +10,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	"github.com/JSYoo5B/SandStack/internal/testhelper"
+	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/secgroups"
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/servers"
 	"github.com/stretchr/testify/suite"
 )
@@ -95,4 +96,29 @@ func (s *ActionSuite) TestRebootServer() {
 
 	s.Assert().Equal("ACTIVE", rebooted.Status)
 	s.Assert().Equal(100, rebooted.Progress)
+}
+
+func (s *ActionSuite) TestAddAndRemoveServerSecurityGroup() {
+	created := s.service.CreateServer(appcompute.CreateServer{
+		Name:     "web",
+		ImageID:  "img-1",
+		FlavorID: "1",
+	})
+	client := testhelper.ServiceClient(s.server.URL + "/demo")
+
+	err := secgroups.AddServer(
+		s.T().Context(),
+		client,
+		created.ID,
+		"default",
+	).ExtractErr()
+	s.Require().NoError(err)
+
+	err = secgroups.RemoveServer(
+		s.T().Context(),
+		client,
+		created.ID,
+		"default",
+	).ExtractErr()
+	s.Require().NoError(err)
 }

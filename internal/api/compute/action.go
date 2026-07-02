@@ -25,6 +25,16 @@ func (h Handler) actionServer(w http.ResponseWriter, r *http.Request) {
 		err = h.service.StopServer(chi.URLParam(r, "server_id"))
 	case request.Has("reboot"):
 		err = h.service.RebootServer(chi.URLParam(r, "server_id"))
+	case request.Has("addSecurityGroup"):
+		err = h.service.AddServerSecurityGroup(
+			chi.URLParam(r, "server_id"),
+			request.SecurityGroupName("addSecurityGroup"),
+		)
+	case request.Has("removeSecurityGroup"):
+		err = h.service.RemoveServerSecurityGroup(
+			chi.URLParam(r, "server_id"),
+			request.SecurityGroupName("removeSecurityGroup"),
+		)
 	default:
 		respond.Error(w, http.StatusBadRequest, "unsupported server action")
 		return
