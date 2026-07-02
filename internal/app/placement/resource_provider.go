@@ -42,5 +42,6 @@ func (s *Service) DeleteResourceProvider(uuid string) error {
 	s.traitRepository.Delete(uuid)
 	s.aggregateRepository.Delete(uuid)
 	s.usageRepository.Delete(uuid)
+	s.allocationRepository.Delete(uuid)
 	return nil
 }

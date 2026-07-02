@@ -35,6 +35,7 @@ func NewHandler(cfg config.Config) Handler {
 			storeplacement.NewMemoryTraitRepository(),
 			storeplacement.NewMemoryAggregateRepository(),
 			storeplacement.NewMemoryUsageRepository(),
+			storeplacement.NewMemoryAllocationRepository(),
 			idgen.Random(),
 		),
 	)
@@ -110,6 +111,10 @@ func (h Handler) Router() http.Handler {
 	router.Get(
 		"/resource_providers/{resource_provider_uuid}/usages",
 		h.getUsages,
+	)
+	router.Get(
+		"/resource_providers/{resource_provider_uuid}/allocations",
+		h.getAllocations,
 	)
 
 	return router

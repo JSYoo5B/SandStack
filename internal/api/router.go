@@ -89,6 +89,7 @@ func NewRouter(cfg config.Config) http.Handler {
 		storeplacement.NewMemoryTraitRepository(),
 		storeplacement.NewMemoryAggregateRepository(),
 		storeplacement.NewMemoryUsageRepository(),
+		storeplacement.NewMemoryAllocationRepository(),
 		idgen.Random(),
 	)
 

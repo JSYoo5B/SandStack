@@ -38,3 +38,10 @@ type UsageRepository interface {
 	Delete(resourceProviderUUID string)
 	Reset()
 }
+
+type AllocationRepository interface {
+	Set(resourceProviderUUID string, allocations map[string]Allocation)
+	Get(resourceProviderUUID string) map[string]Allocation
+	Delete(resourceProviderUUID string)
+	Reset()
+}

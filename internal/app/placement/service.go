@@ -17,6 +17,7 @@ type Service struct {
 	traitRepository            TraitRepository
 	aggregateRepository        AggregateRepository
 	usageRepository            UsageRepository
+	allocationRepository       AllocationRepository
 	idGen                      idgen.Generator
 }
 
@@ -26,6 +27,7 @@ func NewServiceWithRepositories(
 	traitRepository TraitRepository,
 	aggregateRepository AggregateRepository,
 	usageRepository UsageRepository,
+	allocationRepository AllocationRepository,
 	idGen idgen.Generator,
 ) *Service {
 	return &Service{
@@ -34,6 +36,7 @@ func NewServiceWithRepositories(
 		traitRepository:            traitRepository,
 		aggregateRepository:        aggregateRepository,
 		usageRepository:            usageRepository,
+		allocationRepository:       allocationRepository,
 		idGen:                      idGen,
 	}
 }
@@ -44,4 +47,5 @@ func (s *Service) Reset() {
 	s.traitRepository.Reset()
 	s.aggregateRepository.Reset()
 	s.usageRepository.Reset()
+	s.allocationRepository.Reset()
 }

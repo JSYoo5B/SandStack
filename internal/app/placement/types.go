@@ -63,3 +63,12 @@ type Usages struct {
 	ResourceProviderGeneration int
 	Usages                     map[string]int
 }
+
+type Allocation struct {
+	Resources map[string]int
+}
+
+type Allocations struct {
+	ResourceProviderGeneration int
+	Allocations                map[string]Allocation
+}
