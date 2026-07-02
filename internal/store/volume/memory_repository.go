@@ -1,21 +1,25 @@
 package volume
 
-import "sync"
+import (
+	"sync"
+
+	appvolume "github.com/JSYoo5B/SandStack/internal/app/volume"
+)
 
 type MemoryRepository struct {
 	mu      sync.RWMutex
 	ids     []string
-	volumes map[string]Volume
+	volumes map[string]appvolume.Volume
 }
 
 func NewMemoryRepository() *MemoryRepository {
 	return &MemoryRepository{
 		ids:     []string{},
-		volumes: map[string]Volume{},
+		volumes: map[string]appvolume.Volume{},
 	}
 }
 
-func (r *MemoryRepository) Create(volume Volume) Volume {
+func (r *MemoryRepository) Create(volume appvolume.Volume) appvolume.Volume {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -25,11 +29,11 @@ func (r *MemoryRepository) Create(volume Volume) Volume {
 	return volume
 }
 
-func (r *MemoryRepository) List() []Volume {
+func (r *MemoryRepository) List() []appvolume.Volume {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	volumes := make([]Volume, 0, len(r.ids))
+	volumes := make([]appvolume.Volume, 0, len(r.ids))
 	for _, id := range r.ids {
 		volumes = append(volumes, r.volumes[id])
 	}
@@ -37,24 +41,26 @@ func (r *MemoryRepository) List() []Volume {
 	return volumes
 }
 
-func (r *MemoryRepository) Get(id string) (Volume, error) {
+func (r *MemoryRepository) Get(id string) (appvolume.Volume, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	volume, ok := r.volumes[id]
 	if !ok {
-		return Volume{}, ErrVolumeNotFound
+		return appvolume.Volume{}, appvolume.ErrVolumeNotFound
 	}
 
 	return volume, nil
 }
 
-func (r *MemoryRepository) Update(volume Volume) (Volume, error) {
+func (r *MemoryRepository) Update(
+	volume appvolume.Volume,
+) (appvolume.Volume, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if _, ok := r.volumes[volume.ID]; !ok {
-		return Volume{}, ErrVolumeNotFound
+		return appvolume.Volume{}, appvolume.ErrVolumeNotFound
 	}
 
 	r.volumes[volume.ID] = volume
@@ -67,7 +73,7 @@ func (r *MemoryRepository) Delete(id string) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.volumes[id]; !ok {
-		return ErrVolumeNotFound
+		return appvolume.ErrVolumeNotFound
 	}
 
 	delete(r.volumes, id)
@@ -86,5 +92,5 @@ func (r *MemoryRepository) Reset() {
 	defer r.mu.Unlock()
 
 	r.ids = []string{}
-	r.volumes = map[string]Volume{}
+	r.volumes = map[string]appvolume.Volume{}
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/JSYoo5B/SandStack/internal/platform/idgen"
 	storecompute "github.com/JSYoo5B/SandStack/internal/store/compute"
 	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
+	storevolume "github.com/JSYoo5B/SandStack/internal/store/volume"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -40,7 +41,11 @@ func NewRouter(cfg config.Config) http.Handler {
 		idgen.Random(),
 	)
 	networkService := appnetwork.NewService()
-	volumeService := appvolume.NewService()
+	volumeService := appvolume.NewServiceWithRuntime(
+		storevolume.NewMemoryRepository(),
+		clock.Wall(),
+		idgen.Random(),
+	)
 
 	router.Mount("/_sandstack", admin.NewRouterWithState(func() {
 		computeService.Reset()
