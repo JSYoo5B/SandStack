@@ -8,3 +8,11 @@ type Repository interface {
 	Delete(id string) error
 	Reset()
 }
+
+type SnapshotRepository interface {
+	Create(snapshot Snapshot) Snapshot
+	List() []Snapshot
+	Get(id string) (Snapshot, error)
+	Delete(id string) error
+	Reset()
+}

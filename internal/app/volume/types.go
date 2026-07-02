@@ -30,3 +30,26 @@ type VolumeType struct {
 	ExtraSpecs  map[string]string
 	IsPublic    bool
 }
+
+type Snapshot struct {
+	ID          string
+	Name        string
+	Description string
+	VolumeID    string
+	Status      string
+	Size        int
+	Metadata    map[string]string
+	Progress    string
+	ProjectID   string
+	UserID      string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+type CreateSnapshot struct {
+	Name        string
+	Description string
+	VolumeID    string
+	Force       bool
+	Metadata    map[string]string
+}
