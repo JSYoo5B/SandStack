@@ -56,6 +56,7 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/{project_id}", h.version)
 	router.Get("/{project_id}/", h.version)
+	router.Get("/{project_id}/limits", h.getLimits)
 	router.Get("/{project_id}/volumes/detail", h.listVolumes)
 	router.Post("/{project_id}/volumes", h.createVolume)
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)

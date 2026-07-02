@@ -36,6 +36,19 @@ type AvailabilityZone struct {
 	Available bool
 }
 
+type Limits struct {
+	MaxTotalVolumes          int
+	MaxTotalSnapshots        int
+	MaxTotalVolumeGigabytes  int
+	MaxTotalBackups          int
+	MaxTotalBackupGigabytes  int
+	TotalVolumesUsed         int
+	TotalGigabytesUsed       int
+	TotalSnapshotsUsed       int
+	TotalBackupsUsed         int
+	TotalBackupGigabytesUsed int
+}
+
 type Snapshot struct {
 	ID          string
 	Name        string
