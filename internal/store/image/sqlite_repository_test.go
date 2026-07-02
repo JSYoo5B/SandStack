@@ -4,13 +4,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/JSYoo5B/SandStack/internal/app/image"
+	appimage "github.com/JSYoo5B/SandStack/internal/app/image"
+	storeimage "github.com/JSYoo5B/SandStack/internal/store/image"
 	"github.com/stretchr/testify/suite"
 )
 
 type SQLiteRepositorySuite struct {
 	suite.Suite
-	repository *image.SQLiteRepository
+	repository *storeimage.SQLiteRepository
 }
 
 func TestSQLiteRepositorySuite(t *testing.T) {
@@ -18,7 +19,7 @@ func TestSQLiteRepositorySuite(t *testing.T) {
 }
 
 func (s *SQLiteRepositorySuite) SetupTest() {
-	repository, err := image.OpenSQLiteRepository(":memory:")
+	repository, err := storeimage.OpenSQLiteRepository(":memory:")
 	s.Require().NoError(err)
 
 	s.repository = repository
@@ -28,8 +29,8 @@ func (s *SQLiteRepositorySuite) TearDownTest() {
 	s.Require().NoError(s.repository.Close())
 }
 
-func (s *SQLiteRepositorySuite) TestCreateListAndGetImage() {
-	created := s.repository.Create(image.Image{
+func (s *SQLiteRepositorySuite) TestCreateListGetAndUpdateImage() {
+	created := s.repository.Create(appimage.Image{
 		ID:              "img-1",
 		Name:            "ubuntu",
 		Status:          "queued",
@@ -57,7 +58,7 @@ func (s *SQLiteRepositorySuite) TestCreateListAndGetImage() {
 }
 
 func (s *SQLiteRepositorySuite) TestDeleteImage() {
-	created := s.repository.Create(image.Image{
+	created := s.repository.Create(appimage.Image{
 		ID:              "img-1",
 		Name:            "ubuntu",
 		Status:          "queued",
@@ -73,12 +74,12 @@ func (s *SQLiteRepositorySuite) TestDeleteImage() {
 	s.Require().NoError(err)
 
 	_, err = s.repository.Get(created.ID)
-	s.Require().ErrorIs(err, image.ErrImageNotFound)
+	s.Require().ErrorIs(err, appimage.ErrImageNotFound)
 	s.Assert().Empty(s.repository.List())
 }
 
 func (s *SQLiteRepositorySuite) TestResetClearsImages() {
-	s.repository.Create(image.Image{
+	s.repository.Create(appimage.Image{
 		ID:              "img-1",
 		Name:            "ubuntu",
 		Status:          "queued",
@@ -97,10 +98,10 @@ func (s *SQLiteRepositorySuite) TestResetClearsImages() {
 
 func (s *SQLiteRepositorySuite) TestFileBackedDatabasePersistsImages() {
 	path := filepath.Join(s.T().TempDir(), "sandstack.db")
-	repository, err := image.OpenSQLiteRepository(path)
+	repository, err := storeimage.OpenSQLiteRepository(path)
 	s.Require().NoError(err)
 
-	created := repository.Create(image.Image{
+	created := repository.Create(appimage.Image{
 		ID:              "img-1",
 		Name:            "ubuntu",
 		Status:          "queued",
@@ -113,7 +114,7 @@ func (s *SQLiteRepositorySuite) TestFileBackedDatabasePersistsImages() {
 	})
 	s.Require().NoError(repository.Close())
 
-	reopened, err := image.OpenSQLiteRepository(path)
+	reopened, err := storeimage.OpenSQLiteRepository(path)
 	s.Require().NoError(err)
 	defer reopened.Close()
 
