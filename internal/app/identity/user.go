@@ -1,19 +1,10 @@
 package identity
 
-type User struct {
-	DefaultProjectID string
-	Description      string
-	DomainID         string
-	Enabled          bool
-	ID               string
-	Name             string
-}
-
 func (s Service) Users() []User {
-	return []User{s.User()}
+	return s.repositories.Users.List()
 }
 
-func (s Service) User() User {
+func (s Service) defaultUser() User {
 	return User{
 		DefaultProjectID: s.config.ProjectID,
 		Description:      "Default SandStack user",
@@ -21,12 +12,13 @@ func (s Service) User() User {
 		Enabled:          true,
 		ID:               s.config.UserID,
 		Name:             s.config.Username,
+		Password:         s.config.Password,
 	}
 }
 
 func (s Service) UserByID(id string) (User, bool) {
-	user := s.User()
-	if user.ID != id {
+	user, err := s.repositories.Users.Get(id)
+	if err != nil {
 		return User{}, false
 	}
 
