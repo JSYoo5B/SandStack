@@ -35,3 +35,13 @@ func (s *Service) RebootServer(id string) error {
 	_, err = s.serverRepository.Update(server)
 	return err
 }
+
+func (s *Service) AddServerSecurityGroup(id string, _ string) error {
+	_, err := s.serverRepository.Get(id)
+	return err
+}
+
+func (s *Service) RemoveServerSecurityGroup(id string, _ string) error {
+	_, err := s.serverRepository.Get(id)
+	return err
+}
