@@ -31,6 +31,7 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appplacement.NewServiceWithRepositories(
 			storeplacement.NewMemoryResourceProviderRepository(),
+			storeplacement.NewMemoryInventoryRepository(),
 			idgen.Random(),
 		),
 	)
@@ -58,6 +59,30 @@ func (h Handler) Router() http.Handler {
 	router.Delete(
 		"/resource_providers/{resource_provider_uuid}",
 		h.deleteResourceProvider,
+	)
+	router.Get(
+		"/resource_providers/{resource_provider_uuid}/inventories",
+		h.getInventories,
+	)
+	router.Put(
+		"/resource_providers/{resource_provider_uuid}/inventories",
+		h.updateInventories,
+	)
+	router.Delete(
+		"/resource_providers/{resource_provider_uuid}/inventories",
+		h.deleteInventories,
+	)
+	router.Get(
+		"/resource_providers/{resource_provider_uuid}/inventories/{resource_class}",
+		h.getInventory,
+	)
+	router.Put(
+		"/resource_providers/{resource_provider_uuid}/inventories/{resource_class}",
+		h.updateInventory,
+	)
+	router.Delete(
+		"/resource_providers/{resource_provider_uuid}/inventories/{resource_class}",
+		h.deleteInventory,
 	)
 
 	return router
