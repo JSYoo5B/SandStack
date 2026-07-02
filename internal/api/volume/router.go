@@ -32,6 +32,11 @@ func NewHandler(cfg config.Config) Handler {
 		cfg,
 		appvolume.NewServiceWithRuntime(
 			storevolume.NewMemoryRepository(),
+			storevolume.NewMemorySnapshotRepository(),
+			storevolume.NewMemoryTransferRepository(),
+			storevolume.NewMemoryBackupRepository(),
+			storevolume.NewMemoryAttachmentRepository(),
+			storevolume.NewMemoryQuotaRepository(),
 			clock.Wall(),
 			idgen.Random(),
 		),
@@ -52,13 +57,49 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/{project_id}", h.version)
 	router.Get("/{project_id}/", h.version)
+	router.Get("/{project_id}/limits", h.getLimits)
+	router.Get("/{project_id}/os-quota-sets/{quota_project_id}", h.getQuotaSet)
+	router.Put("/{project_id}/os-quota-sets/{quota_project_id}", h.updateQuotaSet)
+	router.Delete("/{project_id}/os-quota-sets/{quota_project_id}", h.deleteQuotaSet)
+	router.Get(
+		"/{project_id}/os-quota-sets/{quota_project_id}/defaults",
+		h.getDefaultQuotaSet,
+	)
 	router.Get("/{project_id}/volumes/detail", h.listVolumes)
 	router.Post("/{project_id}/volumes", h.createVolume)
 	router.Get("/{project_id}/volumes/{volume_id}", h.getVolume)
 	router.Put("/{project_id}/volumes/{volume_id}", h.updateVolume)
 	router.Delete("/{project_id}/volumes/{volume_id}", h.deleteVolume)
+	router.Post("/{project_id}/volumes/{volume_id}/action", h.actionVolume)
+	router.Get("/{project_id}/snapshots", h.listSnapshots)
+	router.Get("/{project_id}/snapshots/detail", h.listSnapshots)
+	router.Post("/{project_id}/snapshots", h.createSnapshot)
+	router.Get("/{project_id}/snapshots/{snapshot_id}", h.getSnapshot)
+	router.Delete("/{project_id}/snapshots/{snapshot_id}", h.deleteSnapshot)
+	router.Get("/{project_id}/os-volume-transfer/detail", h.listTransfers)
+	router.Post("/{project_id}/os-volume-transfer", h.createTransfer)
+	router.Get("/{project_id}/os-volume-transfer/{transfer_id}", h.getTransfer)
+	router.Delete("/{project_id}/os-volume-transfer/{transfer_id}", h.deleteTransfer)
+	router.Post("/{project_id}/os-volume-transfer/{transfer_id}/accept", h.acceptTransfer)
+	router.Get("/{project_id}/backups", h.listBackups)
+	router.Get("/{project_id}/backups/detail", h.listBackups)
+	router.Post("/{project_id}/backups", h.createBackup)
+	router.Get("/{project_id}/backups/{backup_id}", h.getBackup)
+	router.Delete("/{project_id}/backups/{backup_id}", h.deleteBackup)
+	router.Get("/{project_id}/attachments/detail", h.listAttachments)
+	router.Post("/{project_id}/attachments", h.createAttachment)
+	router.Get("/{project_id}/attachments/{attachment_id}", h.getAttachment)
+	router.Put("/{project_id}/attachments/{attachment_id}", h.updateAttachment)
+	router.Delete("/{project_id}/attachments/{attachment_id}", h.deleteAttachment)
+	router.Post("/{project_id}/attachments/{attachment_id}/action", h.actionAttachment)
 	router.Get("/{project_id}/types", h.listVolumeTypes)
 	router.Get("/{project_id}/types/{type_id}", h.getVolumeType)
+	router.Get("/{project_id}/types/{type_id}/extra_specs", h.listExtraSpecs)
+	router.Post("/{project_id}/types/{type_id}/extra_specs", h.createExtraSpecs)
+	router.Get("/{project_id}/types/{type_id}/extra_specs/{key}", h.getExtraSpec)
+	router.Put("/{project_id}/types/{type_id}/extra_specs/{key}", h.updateExtraSpec)
+	router.Delete("/{project_id}/types/{type_id}/extra_specs/{key}", h.deleteExtraSpec)
+	router.Get("/{project_id}/os-availability-zone", h.listAvailabilityZones)
 
 	return router
 }

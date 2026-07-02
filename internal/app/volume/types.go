@@ -30,3 +30,153 @@ type VolumeType struct {
 	ExtraSpecs  map[string]string
 	IsPublic    bool
 }
+
+type AvailabilityZone struct {
+	Name      string
+	Available bool
+}
+
+type Limits struct {
+	MaxTotalVolumes          int
+	MaxTotalSnapshots        int
+	MaxTotalVolumeGigabytes  int
+	MaxTotalBackups          int
+	MaxTotalBackupGigabytes  int
+	TotalVolumesUsed         int
+	TotalGigabytesUsed       int
+	TotalSnapshotsUsed       int
+	TotalBackupsUsed         int
+	TotalBackupGigabytesUsed int
+}
+
+type QuotaSet struct {
+	ID                 string
+	Volumes            int
+	Snapshots          int
+	Gigabytes          int
+	PerVolumeGigabytes int
+	Backups            int
+	BackupGigabytes    int
+	Groups             int
+}
+
+type UpdateQuotaSet struct {
+	Volumes            *int
+	Snapshots          *int
+	Gigabytes          *int
+	PerVolumeGigabytes *int
+	Backups            *int
+	BackupGigabytes    *int
+	Groups             *int
+}
+
+type QuotaUsageSet struct {
+	ID                 string
+	Volumes            QuotaUsage
+	Snapshots          QuotaUsage
+	Gigabytes          QuotaUsage
+	PerVolumeGigabytes QuotaUsage
+	Backups            QuotaUsage
+	BackupGigabytes    QuotaUsage
+	Groups             QuotaUsage
+}
+
+type QuotaUsage struct {
+	InUse     int
+	Reserved  int
+	Limit     int
+	Allocated int
+}
+
+type Snapshot struct {
+	ID          string
+	Name        string
+	Description string
+	VolumeID    string
+	Status      string
+	Size        int
+	Metadata    map[string]string
+	Progress    string
+	ProjectID   string
+	UserID      string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+type CreateSnapshot struct {
+	Name        string
+	Description string
+	VolumeID    string
+	Force       bool
+	Metadata    map[string]string
+}
+
+type Transfer struct {
+	ID        string
+	AuthKey   string
+	Name      string
+	VolumeID  string
+	CreatedAt string
+	Links     []map[string]string
+}
+
+type CreateTransfer struct {
+	Name     string
+	VolumeID string
+}
+
+type Backup struct {
+	ID                  string
+	Name                string
+	Description         string
+	VolumeID            string
+	SnapshotID          string
+	Status              string
+	Size                int
+	ObjectCount         int
+	Container           string
+	HasDependentBackups bool
+	FailReason          string
+	IsIncremental       bool
+	ProjectID           string
+	Metadata            map[string]string
+	AvailabilityZone    string
+	CreatedAt           string
+	UpdatedAt           string
+	DataTimestamp       string
+}
+
+type CreateBackup struct {
+	Name             string
+	Description      string
+	VolumeID         string
+	Force            bool
+	Metadata         map[string]string
+	Container        string
+	Incremental      bool
+	SnapshotID       string
+	AvailabilityZone string
+}
+
+type Attachment struct {
+	ID             string
+	VolumeID       string
+	Instance       string
+	AttachedAt     string
+	DetachedAt     string
+	Status         string
+	AttachMode     string
+	ConnectionInfo map[string]any
+	Connector      map[string]any
+}
+
+type CreateAttachment struct {
+	VolumeID   string
+	InstanceID string
+	Connector  map[string]any
+	Mode       string
+}
+
+type UpdateAttachment struct {
+	Connector map[string]any
+}

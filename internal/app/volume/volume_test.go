@@ -23,6 +23,11 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
 	service := volume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
+		storevolume.NewMemorySnapshotRepository(),
+		storevolume.NewMemoryTransferRepository(),
+		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(now),
 		idgen.Random(),
 	)
@@ -39,6 +44,11 @@ func (s *VolumeSuite) TestCreateVolumeUsesInjectedClock() {
 func (s *VolumeSuite) TestCreateVolumeUsesInjectedIDGenerator() {
 	service := volume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
+		storevolume.NewMemorySnapshotRepository(),
+		storevolume.NewMemoryTransferRepository(),
+		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -55,6 +65,11 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 	now := time.Date(2026, 6, 23, 8, 30, 0, 123456000, time.UTC)
 	service := volume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
+		storevolume.NewMemorySnapshotRepository(),
+		storevolume.NewMemoryTransferRepository(),
+		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(now),
 		idgen.Fixed("volume-id"),
 	)
@@ -74,6 +89,11 @@ func (s *VolumeSuite) TestGetVolumeMakesCreatedVolumeAvailable() {
 func (s *VolumeSuite) TestResetClearsVolumes() {
 	service := volume.NewServiceWithRuntime(
 		storevolume.NewMemoryRepository(),
+		storevolume.NewMemorySnapshotRepository(),
+		storevolume.NewMemoryTransferRepository(),
+		storevolume.NewMemoryBackupRepository(),
+		storevolume.NewMemoryAttachmentRepository(),
+		storevolume.NewMemoryQuotaRepository(),
 		clock.Fixed(time.Time{}),
 		idgen.Fixed("volume-id"),
 	)
@@ -81,8 +101,28 @@ func (s *VolumeSuite) TestResetClearsVolumes() {
 		Size: 1,
 		Name: "database",
 	})
+	service.CreateSnapshot(volume.CreateSnapshot{
+		Name:     "database-snapshot",
+		VolumeID: "vol-volume-id",
+	})
+	service.CreateTransfer(volume.CreateTransfer{
+		Name:     "database-transfer",
+		VolumeID: "vol-volume-id",
+	})
+	service.CreateBackup(volume.CreateBackup{
+		Name:     "database-backup",
+		VolumeID: "vol-volume-id",
+	})
+	service.CreateAttachment(volume.CreateAttachment{
+		VolumeID:   "vol-volume-id",
+		InstanceID: "server-id",
+	})
 
 	service.Reset()
 
 	s.Assert().Empty(service.List())
+	s.Assert().Empty(service.ListSnapshots())
+	s.Assert().Empty(service.ListTransfers())
+	s.Assert().Empty(service.ListBackups())
+	s.Assert().Empty(service.ListAttachments())
 }
