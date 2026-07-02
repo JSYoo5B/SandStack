@@ -7,14 +7,13 @@ import (
 )
 
 type Service struct {
-	mu        sync.RWMutex
-	ids       []string
-	networks  map[string]Network
-	subnetIDs []string
-	subnets   map[string]Subnet
-	portIDs   []string
-	ports     map[string]Port
-	idGen     idgen.Generator
+	mu                sync.RWMutex
+	networkRepository NetworkRepository
+	subnetIDs         []string
+	subnets           map[string]Subnet
+	portIDs           []string
+	ports             map[string]Port
+	idGen             idgen.Generator
 }
 
 func NewService() *Service {
@@ -22,14 +21,23 @@ func NewService() *Service {
 }
 
 func NewServiceWithIDGenerator(idGen idgen.Generator) *Service {
+	return NewServiceWithRepositories(
+		NewMemoryNetworkRepository(),
+		idGen,
+	)
+}
+
+func NewServiceWithRepositories(
+	networkRepository NetworkRepository,
+	idGen idgen.Generator,
+) *Service {
 	return &Service{
-		ids:       []string{},
-		networks:  map[string]Network{},
-		subnetIDs: []string{},
-		subnets:   map[string]Subnet{},
-		portIDs:   []string{},
-		ports:     map[string]Port{},
-		idGen:     idGen,
+		networkRepository: networkRepository,
+		subnetIDs:         []string{},
+		subnets:           map[string]Subnet{},
+		portIDs:           []string{},
+		ports:             map[string]Port{},
+		idGen:             idGen,
 	}
 }
 
@@ -37,8 +45,7 @@ func (s *Service) Reset() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.ids = []string{}
-	s.networks = map[string]Network{}
+	s.networkRepository.Reset()
 	s.subnetIDs = []string{}
 	s.subnets = map[string]Subnet{}
 	s.portIDs = []string{}

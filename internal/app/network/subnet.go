@@ -44,10 +44,10 @@ func (s *Service) CreateSubnet(input CreateSubnet) Subnet {
 	s.subnetIDs = append(s.subnetIDs, subnet.ID)
 	s.subnets[subnet.ID] = subnet
 
-	network, ok := s.networks[subnet.NetworkID]
-	if ok {
+	network, err := s.networkRepository.Get(subnet.NetworkID)
+	if err == nil {
 		network.Subnets = append(network.Subnets, subnet.ID)
-		s.networks[subnet.NetworkID] = network
+		_, _ = s.networkRepository.Update(network)
 	}
 
 	return subnet
@@ -82,10 +82,10 @@ func (s *Service) DeleteSubnet(id string) error {
 		}
 	}
 
-	network, ok := s.networks[subnet.NetworkID]
-	if ok {
+	network, err := s.networkRepository.Get(subnet.NetworkID)
+	if err == nil {
 		network.Subnets = removeString(network.Subnets, id)
-		s.networks[subnet.NetworkID] = network
+		_, _ = s.networkRepository.Update(network)
 	}
 
 	return nil
