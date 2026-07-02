@@ -30,5 +30,6 @@ func (s Service) Reset() {
 	s.repositories.Projects.Reset()
 	s.repositories.Users.Reset()
 	s.repositories.Roles.Reset()
+	s.repositories.Tokens.Reset()
 	s.SeedDefaults()
 }

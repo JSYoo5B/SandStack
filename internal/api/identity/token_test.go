@@ -70,6 +70,73 @@ func (s *TokenSuite) TestPasswordAuth() {
 	)
 }
 
+func (s *TokenSuite) TestGetIssuedToken() {
+	client := testhelper.ServiceClient(s.server.URL)
+	result := tokens.Create(
+		s.T().Context(),
+		client,
+		testhelper.PasswordAuthOptions(),
+	)
+	tokenID, err := result.ExtractTokenID()
+	s.Require().NoError(err)
+	s.Require().NotEmpty(tokenID)
+
+	getResult := tokens.Get(
+		s.T().Context(),
+		client,
+		tokenID,
+	)
+	found, err := getResult.ExtractToken()
+	s.Require().NoError(err)
+	s.Require().NotNil(found)
+
+	user, err := getResult.ExtractUser()
+	s.Require().NoError(err)
+	s.Require().NotNil(user)
+	project, err := getResult.ExtractProject()
+	s.Require().NoError(err)
+	s.Require().NotNil(project)
+
+	s.Assert().Equal(tokenID, found.ID)
+	s.Assert().Equal("admin", user.Name)
+	s.Assert().Equal("demo", project.Name)
+}
+
+func (s *TokenSuite) TestValidateAndRevokeIssuedToken() {
+	client := testhelper.ServiceClient(s.server.URL)
+	result := tokens.Create(
+		s.T().Context(),
+		client,
+		testhelper.PasswordAuthOptions(),
+	)
+	tokenID, err := result.ExtractTokenID()
+	s.Require().NoError(err)
+	s.Require().NotEmpty(tokenID)
+
+	ok, err := tokens.Validate(
+		s.T().Context(),
+		client,
+		tokenID,
+	)
+	s.Require().NoError(err)
+	s.Assert().True(ok)
+
+	revokeResult := tokens.Revoke(
+		s.T().Context(),
+		client,
+		tokenID,
+	)
+	s.Require().NoError(revokeResult.Err)
+
+	ok, err = tokens.Validate(
+		s.T().Context(),
+		client,
+		tokenID,
+	)
+	s.Require().NoError(err)
+	s.Assert().False(ok)
+}
+
 func computeEndpoint(catalog []tokens.CatalogEntry) string {
 	for _, entry := range catalog {
 		if entry.Type != "compute" {

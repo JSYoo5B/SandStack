@@ -24,7 +24,7 @@ func (s Service) AuthenticatePassword(auth PasswordAuth, baseURL string) (Issued
 
 	now := time.Now().UTC()
 	roles := s.repositories.Roles.List()
-	return IssuedToken{
+	issuedToken := IssuedToken{
 		ID:        "sandstack-" + idgen.RandomHex(16),
 		ExpiresAt: now.Add(24 * time.Hour).Format(time.RFC3339),
 		IssuedAt:  now.Format(time.RFC3339),
@@ -41,7 +41,17 @@ func (s Service) AuthenticatePassword(auth PasswordAuth, baseURL string) (Issued
 		},
 		Roles:   tokenRoles(roles),
 		Catalog: s.Catalog(baseURL),
-	}, nil
+	}
+
+	return s.repositories.Tokens.Save(issuedToken), nil
+}
+
+func (s Service) TokenByID(id string) (IssuedToken, error) {
+	return s.repositories.Tokens.Get(id)
+}
+
+func (s Service) RevokeToken(id string) error {
+	return s.repositories.Tokens.Delete(id)
 }
 
 func tokenRoles(roles []roles.Role) []tokens.Role {

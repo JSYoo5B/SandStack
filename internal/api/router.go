@@ -38,6 +38,7 @@ func NewRouter(cfg config.Config) http.Handler {
 			Users:    storeidentity.NewMemoryUserRepository(),
 			Projects: storeidentity.NewMemoryProjectRepository(),
 			Roles:    storeidentity.NewMemoryRoleRepository(),
+			Tokens:   storeidentity.NewMemoryTokenRepository(),
 		},
 	)
 	identityHandler := identity.NewHandlerWithService(cfg, identityService)

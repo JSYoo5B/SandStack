@@ -9,6 +9,7 @@ type Repositories struct {
 	Users    UserRepository
 	Projects ProjectRepository
 	Roles    RoleRepository
+	Tokens   TokenRepository
 }
 
 type UserRepository interface {
@@ -31,5 +32,12 @@ type RoleRepository interface {
 	Save(role roles.Role) roles.Role
 	List() []roles.Role
 	Get(id string) (roles.Role, error)
+	Reset()
+}
+
+type TokenRepository interface {
+	Save(token IssuedToken) IssuedToken
+	Get(id string) (IssuedToken, error)
+	Delete(id string) error
 	Reset()
 }
