@@ -34,6 +34,7 @@ func NewHandler(cfg config.Config) Handler {
 			storeplacement.NewMemoryInventoryRepository(),
 			storeplacement.NewMemoryTraitRepository(),
 			storeplacement.NewMemoryAggregateRepository(),
+			storeplacement.NewMemoryUsageRepository(),
 			idgen.Random(),
 		),
 	)
@@ -105,6 +106,10 @@ func (h Handler) Router() http.Handler {
 	router.Put(
 		"/resource_providers/{resource_provider_uuid}/aggregates",
 		h.updateAggregates,
+	)
+	router.Get(
+		"/resource_providers/{resource_provider_uuid}/usages",
+		h.getUsages,
 	)
 
 	return router
