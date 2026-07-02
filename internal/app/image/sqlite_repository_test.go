@@ -43,14 +43,17 @@ func (s *SQLiteRepositorySuite) TestCreateListAndGetImage() {
 		CreatedAt:       "2026-07-03T00:00:00Z",
 		UpdatedAt:       "2026-07-03T00:00:00Z",
 	})
+	created.Name = "ubuntu-updated"
 
+	updated, err := s.repository.Update(created)
+	s.Require().NoError(err)
 	listed := s.repository.List()
 	found, err := s.repository.Get(created.ID)
 	s.Require().NoError(err)
 
 	s.Assert().Len(listed, 1)
-	s.Assert().Equal(created, listed[0])
-	s.Assert().Equal(created, found)
+	s.Assert().Equal(updated, listed[0])
+	s.Assert().Equal(updated, found)
 }
 
 func (s *SQLiteRepositorySuite) TestDeleteImage() {

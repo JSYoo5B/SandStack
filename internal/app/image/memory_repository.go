@@ -49,6 +49,19 @@ func (r *MemoryRepository) Get(id string) (Image, error) {
 	return image, nil
 }
 
+func (r *MemoryRepository) Update(image Image) (Image, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, ok := r.images[image.ID]; !ok {
+		return Image{}, ErrImageNotFound
+	}
+
+	r.images[image.ID] = image
+
+	return image, nil
+}
+
 func (r *MemoryRepository) Delete(id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
