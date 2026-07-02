@@ -33,6 +33,8 @@ func (h Handler) Router() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/", h.version)
 	router.Post("/auth/tokens", h.createToken)
+	router.Get("/projects", h.listProjects)
+	router.Get("/projects/{project_id}", h.getProject)
 
 	return router
 }
