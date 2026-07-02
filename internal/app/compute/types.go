@@ -73,6 +73,18 @@ type ServerGroup struct {
 	Policy    string
 }
 
+type ComputeService struct {
+	ID             string
+	Binary         string
+	DisabledReason string
+	ForcedDown     bool
+	Host           string
+	State          string
+	Status         string
+	UpdatedAt      string
+	Zone           string
+}
+
 type Limits struct {
 	MaxTotalCores           int
 	MaxImageMeta            int
