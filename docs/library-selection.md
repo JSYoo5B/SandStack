@@ -6,9 +6,12 @@
 
 Use `github.com/gophercloud/gophercloud/v2`.
 
-Gophercloud is the primary compatibility target. SandStack should use it in tests to verify authentication, service catalog discovery, request shapes, response extraction, and error handling.
+Gophercloud is the primary compatibility target. SandStack should use it in
+tests to verify authentication, service catalog discovery, request shapes,
+response extraction, and error handling.
 
-The exact version should be pinned during implementation after checking available module versions locally.
+The exact version should be pinned during implementation after checking
+available module versions locally.
 
 ## Selected
 
@@ -16,15 +19,18 @@ The exact version should be pinned during implementation after checking availabl
 
 Use `github.com/go-chi/chi/v5` for HTTP routing.
 
-Chi gives SandStack readable route grouping and middleware composition while keeping handlers compatible with `net/http`.
+Chi gives SandStack readable route grouping and middleware composition while
+keeping handlers compatible with `net/http`.
 
 ## Deferred Until Needed
 
 ### YAML
 
-Use `gopkg.in/yaml.v3` for scenario parsing when scenario loading becomes part of the implementation.
+Use `gopkg.in/yaml.v3` for scenario parsing when scenario loading becomes part
+of the implementation.
 
-The scenario format is YAML-first. Strict decoding should be used where possible so invalid scenario files fail early.
+The scenario format is YAML-first. Strict decoding should be used where
+possible so invalid scenario files fail early.
 
 ### Test Assertions
 
@@ -41,7 +47,8 @@ variables.
 
 ### Durable Persistence
 
-GORM or database drivers should be considered only when a durable state backend is actually implemented.
+GORM or database drivers should be considered only when a durable state backend
+is actually implemented.
 
 ## Avoid Initially
 
