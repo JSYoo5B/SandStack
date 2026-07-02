@@ -72,6 +72,7 @@ func NewRouter(cfg config.Config) http.Handler {
 		storevolume.NewMemoryRepository(),
 		storevolume.NewMemorySnapshotRepository(),
 		storevolume.NewMemoryTransferRepository(),
+		storevolume.NewMemoryBackupRepository(),
 		clock.Wall(),
 		idgen.Random(),
 	)

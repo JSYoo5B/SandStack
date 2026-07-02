@@ -67,3 +67,36 @@ type CreateTransfer struct {
 	Name     string
 	VolumeID string
 }
+
+type Backup struct {
+	ID                  string
+	Name                string
+	Description         string
+	VolumeID            string
+	SnapshotID          string
+	Status              string
+	Size                int
+	ObjectCount         int
+	Container           string
+	HasDependentBackups bool
+	FailReason          string
+	IsIncremental       bool
+	ProjectID           string
+	Metadata            map[string]string
+	AvailabilityZone    string
+	CreatedAt           string
+	UpdatedAt           string
+	DataTimestamp       string
+}
+
+type CreateBackup struct {
+	Name             string
+	Description      string
+	VolumeID         string
+	Force            bool
+	Metadata         map[string]string
+	Container        string
+	Incremental      bool
+	SnapshotID       string
+	AvailabilityZone string
+}
